@@ -1,3 +1,9 @@
 # 3Dsimo Kit manual
 
-Text Text
+## English Manual
+
+[English Manual](pdf/manualEN.pdf)
+
+## Czech Manual
+
+[Czech Manual](pdf/manualCZ.pdf)
