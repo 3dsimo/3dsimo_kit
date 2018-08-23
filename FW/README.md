@@ -10,3 +10,6 @@ The data on the 3Dsimo KIT will be overwritten in the flashing process. But you 
 You will need:
 - [Download Arduino IDE](https://www.arduino.cc/en/Main/Software)
 - [One of those .ino files](../FW/3DsimoKit)
+
+### Troubleshooting
+- Redeclaration and definiton errors: don't save multiple ino files in one folder. The simplest way to update/change the firmware is to make a new sketch in the Arduino IDE and copy and paste the code from one of the files from Github, then save locally, then upload.
