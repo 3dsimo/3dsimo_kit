@@ -262,7 +262,7 @@ void timerAction(){
     }
   }
 
-  // assing functions according to heating state (mainly button function)
+  // assign functions according to heating state (mainly button function)
   switch(statusHeating){
     case STATE_COOLING:
     case STATE_READY:{

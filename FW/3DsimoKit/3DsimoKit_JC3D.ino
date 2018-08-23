@@ -11,8 +11,8 @@
 
 #define LED_NANO    13    // LED placed on Arduino Nano board
 
-#define BTN_UP      12    // controlling button UP/PLUS                /* NEW! changed for right hand - default 11 */
-#define BTN_DOWN    11    // controlling button DOWN/MINUS             /* NEW! changed for right hand - default 12 */
+#define BTN_UP      11    // controlling button UP/PLUS                /* old NEW! changed for right hand - default 11 */
+#define BTN_DOWN    12    // controlling button DOWN/MINUS             /* NEWER! The pins seem to be right, the if-checks in ln 353 weren't...
 #define BTN_EXT     8     // button for material extrusion
 #define BTN_REV     7     // button for material reverse
 
@@ -267,7 +267,7 @@ void timerAction(){
     }
   }
 
-  // assing functions according to heating state (mainly button function)
+  // assign functions according to heating state (mainly button function)
   switch(statusHeating){
     case STATE_COOLING:
     case STATE_READY:{
@@ -350,7 +350,7 @@ void timerAction(){
 
 
 // button UP pressed
-  if(!digitalRead(BTN_UP) && digitalRead(BTN_DOWN)){
+  if(digitalRead(BTN_UP) && !digitalRead(BTN_DOWN)){
     if(!(buttonsPressed & 0x01)){
       if(materialID < MATERIAL_COUNT-1){
         ++materialID;        
@@ -369,7 +369,7 @@ void timerAction(){
   }
 
   // button DOWN pressed
-  if(digitalRead(BTN_UP) && !digitalRead(BTN_DOWN)){
+  if(!digitalRead(BTN_UP) && digitalRead(BTN_DOWN)){
     if(!(buttonsPressed & 0x02)){
       if(materialID > 0){
         --materialID;
