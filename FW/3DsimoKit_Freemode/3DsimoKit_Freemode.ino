@@ -78,7 +78,8 @@ const profile_t materials[] PROGMEM = {
 
 int materialID = 0;         // chosen material profile
 int setTemperature = 0;   // set heater temperature
-int setMotorSpeed = 0;     // set motor speed in %
+int setMotorSpeed = 40;     // set motor speed in % // hardcoded at 40% for now (will be changeable later)
+                            // ToDo maybe add icrement step value (hardcoded at 5)
 
 /*
  *   create timer for main loop
@@ -127,6 +128,16 @@ void loadMaterial(int id){
   ssd1306_setFixedFont(ssd1306xled_font6x8);
   ssd1306_printFixedN(0,  0, profile.materialName, STYLE_NORMAL, FONT_SIZE_2X);  
   ssd1306_printFixedN(80, 0, text, STYLE_NORMAL, FONT_SIZE_2X);
+}
+
+void displayControls() {
+  char text[10];  
+   // clear display and show all information TODO: Move
+  sprintf(text, "%d %%", setMotorSpeed); // string format: %d = int, %% = "%" for the motor value
+  ssd1306_clearScreen();
+  ssd1306_setFixedFont(ssd1306xled_font6x8);
+  // ssd1306_printFixedN(0,  0, profile.materialName, STYLE_NORMAL, FONT_SIZE_2X);  
+  ssd1306_printFixedN(80, 0, text, STYLE_NORMAL, FONT_SIZE_2X); 
 }
 
 /*
@@ -368,17 +379,14 @@ void timerAction(){
     // Note: http://www.hw2sw.com/2011/09/13/arduino-bitwise-operators-and-advanced-tricks/
   } else {
     if (buttonsPressed & 0x01) {  // "Was I pressed in the last cycle?"
-      if (materialID < MATERIAL_COUNT-1){
-        ++materialID;        
-      } else {
-        materialID = 0;
+      if (setTemperature <= MAXTEMP - 5){
+        setTemperature += 5;  
+        displayControls();
       }
-      loadMaterial(materialID);
     }
     
     // save that this button UP was released
-    buttonsPressed &= 0xFE;
-    
+    buttonsPressed &= 0xFE;    
     // ToDo: okay I'm puzzled, it's a mask for the bitwise flag thingy, I guess. 
     // But why this huge HEX number... why not "2"... maybe to support future buttons? 
     // what it does: "and" sets only true if both are true. wtf it actually does with the 0xFE?! black magic...
@@ -391,12 +399,10 @@ void timerAction(){
     buttonsPressed |= 0x02;
   } else {
     if (buttonsPressed & 0x02) {
-      if (materialID > 0){
-        --materialID;
-      } else {
-        materialID = MATERIAL_COUNT-1;
+      if (setTemperature >= MINTEMP + 5){
+        setTemperature -= 5;
+        displayControls();
       }
-      loadMaterial(materialID);
     }    
     // save that this button DOWN was released
     buttonsPressed &= 0xFD;
@@ -435,7 +441,8 @@ void setup() {
  * TODO material ID
  */
   // load material profile
-  loadMaterial(materialID);
+  // loadMaterial(materialID);
+  displayControls(); // setMotor&Temp should work globally, only display remains
 
   // preset timer period every 50 ms and call timerAction function when time expire
   timer.Every(50, timerAction);
