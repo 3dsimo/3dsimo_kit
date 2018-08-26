@@ -7,7 +7,7 @@
  */
 
 /*
- *  ssd1306   128x32   Alexey Dinda Library
+ *  ssd1306   128x32   Alexey Dynda Library
  */
 #include "ssd1306.h"
 #include "nano_gfx.h"
@@ -112,7 +112,7 @@ int getTemperature(){  // get temperature in deg. Celsius from ADU value
 
 /* TODO Change into update_display funtion. will be callled after button updown press and simply draws speed and temp
  *   load actual material profile
- */
+ *
 void loadMaterial(int id){
   profile_t profile;
   char text[10];
@@ -128,16 +128,29 @@ void loadMaterial(int id){
   ssd1306_setFixedFont(ssd1306xled_font6x8);
   ssd1306_printFixedN(0,  0, profile.materialName, STYLE_NORMAL, FONT_SIZE_2X);  
   ssd1306_printFixedN(80, 0, text, STYLE_NORMAL, FONT_SIZE_2X);
-}
+} */
 
 void displayControls() {
-  char text[10];  
-   // clear display and show all information TODO: Move
-  sprintf(text, "%d %%", setMotorSpeed); // string format: %d = int, %% = "%" for the motor value
+  
+  char textSetTemp[5];     // Buffer for line 2: The user Input / Controls: setTemperature and setMotorSpeed
+  char textSetMotor[5];
+  sprintf(textSetTemp,"%3d ", setTemperature);
+  sprintf(textSetMotor,"%3d ",setMotorSpeed);
+  
+  // clear display and show all information
   ssd1306_clearScreen();
   ssd1306_setFixedFont(ssd1306xled_font6x8);
-  // ssd1306_printFixedN(0,  0, profile.materialName, STYLE_NORMAL, FONT_SIZE_2X);  
-  ssd1306_printFixedN(80, 0, text, STYLE_NORMAL, FONT_SIZE_2X); 
+
+  // TODO: change Selection (negativeMode) according to ControlMode
+  ssd1306_negativeMode();
+  ssd1306_printFixedN(0, 16, textSetTemp, STYLE_NORMAL, FONT_SIZE_2X);
+  ssd1306_printFixedN(36+3, 24, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
+  ssd1306_positiveMode();
+  ssd1306_printFixedN(128-4*12, 16, textSetMotor, STYLE_NORMAL, FONT_SIZE_2X);
+  ssd1306_printFixedN(128-12+3, 24, "%", STYLE_NORMAL, FONT_SIZE_NORMAL);
+  ssd1306_printFixedN(60, 16, "<", STYLE_NORMAL, FONT_SIZE_NORMAL);
+  ssd1306_printFixedN(60, 24, ">", STYLE_NORMAL, FONT_SIZE_NORMAL);
+
 }
 
 /*
@@ -206,7 +219,7 @@ int heating(){
   static int tempAvg[NO_AVERAGES_VALUES];   // temperature array for averaging it
   static int tempAvgIter = 0;               // current index in temperature array
   static char firstTime = 0;                // if is 1, this function ran at least one time
-  char text[30];                            // buffer for text
+  char text[5];                            // buffer for text
 
   // variables initialization
   if(!firstTime){
@@ -233,9 +246,10 @@ int heating(){
   sumTemp /= NO_AVERAGES_VALUES;
 
   // show on display actual and preset temperature
-  sprintf(text, "%3d/%3dC", sumTemp, setTemperature);
+  sprintf(text, "%3d ", sumTemp);
   ssd1306_setFixedFont(ssd1306xled_font6x8);
-  ssd1306_printFixedN(0, 16, text, STYLE_NORMAL, FONT_SIZE_2X);
+  ssd1306_printFixedN(0, 0, text, STYLE_NORMAL, FONT_SIZE_2X);
+  ssd1306_printFixedN(36+3, 8, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
 
 /*
  * debug output into display and to serial
@@ -271,20 +285,20 @@ void timerAction(){
     // but it is possible to do extrusion/reverse
     if(actualTemperature > setTemperature + 10){
       statusHeating = STATE_COOLING;
-      ssd1306_printFixedN(116, 16, "C", STYLE_NORMAL, FONT_SIZE_2X);
+      ssd1306_printFixedN(128-4*12, 0, "COOL", STYLE_NORMAL, FONT_SIZE_2X);
     }
 
     // tolerant zone where temperature is OK for extrusion/reverse
     else if(actualTemperature > setTemperature - 10){
       statusHeating = STATE_READY;
-      ssd1306_printFixedN(116, 16, "R", STYLE_NORMAL, FONT_SIZE_2X);
+      ssd1306_printFixedN(128-4*12, 0, "DONE", STYLE_NORMAL, FONT_SIZE_2X);
       digitalWrite(LED_NANO, HIGH);   // turn the LED on (HIGH is the voltage level)
     }
 
     // tolerant zone where temperature is LOW for extrusion/reverse
     else{
       statusHeating = STATE_HEATING;
-      ssd1306_printFixedN(116, 16, "H", STYLE_NORMAL, FONT_SIZE_2X);
+      ssd1306_printFixedN(128-4*12, 0, "HEAT", STYLE_NORMAL, FONT_SIZE_2X);
       digitalWrite(LED_NANO, !digitalRead(LED_NANO));   // turn the LED on (HIGH is the voltage level)
     }
   }
@@ -437,11 +451,6 @@ void setup() {
   pinMode(BTN_EXT,  INPUT_PULLUP);
   pinMode(BTN_REV,  INPUT_PULLUP);
 
-/* TODO
- * TODO material ID
- */
-  // load material profile
-  // loadMaterial(materialID);
   displayControls(); // setMotor&Temp should work globally, only display remains
 
   // preset timer period every 50 ms and call timerAction function when time expire
