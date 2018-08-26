@@ -14,13 +14,14 @@
 #include <EveryTimer.h>
 
 /*
- *   define Input/Outputs
+ *   define Input/Outputs. 
+ *   Buttons: LOW/false/0 = pressed, HIGH/true/1 = not pressed!
  */
 
 #define LED_NANO    13    // LED placed on Arduino Nano board
 
-#define BTN_UP      11    // controlling button UP/PLUS
-#define BTN_DOWN    12    // controlling button DOWN/MINUS
+#define BTN_UP      12    // controlling button UP/PLUS    // pin 11 & 12 changed for right hand use
+#define BTN_DOWN    11    // controlling button DOWN/MINUS
 #define BTN_EXT     8     // button for material extrusion
 #define BTN_REV     7     // button for material reverse
 
@@ -48,12 +49,18 @@ enum {
   MOTOR_REVERSE_AFTER_EXTRUSION
 } MOTOR_STATE_e;
 
+enum {
+  MODE_TEMP,
+  MODE_SPEED
+} MODE_CONTROL_e;
+
 #define MAXTEMP 255         // not sure whats better: define or cont, also not sure about the actual max temp... testing with 255
 #define MINTEMP 0
 
-int setTemperature = 0;   // set heater temperature
-int setMotorSpeed = 40;     // set motor speed in % // hardcoded at 40% for now (will be changeable later)
-                            // ToDo maybe add icrement step value (hardcoded at 5)
+int setTemperature = 0;         // set heater temperature
+int setMotorSpeed = 40;         // set motor speed in % // hardcoded at 40% for now (will be changeable later)
+                                // ToDo maybe add icrement step value (hardcoded at 5)
+char controlMode = MODE_TEMP;   // ToDo: maybe not global... somewhere static?
 
 /*
  *   create timer for main loop
@@ -100,12 +107,22 @@ void displayControls() {
   ssd1306_setFixedFont(ssd1306xled_font6x8);
 
   // TODO: change Selection (negativeMode) according to ControlMode
-  ssd1306_negativeMode();
-  ssd1306_printFixedN(0, 16, textSetTemp, STYLE_NORMAL, FONT_SIZE_2X);
-  ssd1306_printFixedN(36+3, 24, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
-  ssd1306_positiveMode();
-  ssd1306_printFixedN(128-4*12, 16, textSetMotor, STYLE_NORMAL, FONT_SIZE_2X);
-  ssd1306_printFixedN(128-12+3, 24, "%", STYLE_NORMAL, FONT_SIZE_NORMAL);
+  if (controlMode == MODE_TEMP) {
+    ssd1306_negativeMode();
+    ssd1306_printFixedN(0, 16, textSetTemp, STYLE_NORMAL, FONT_SIZE_2X);
+    ssd1306_printFixedN(36+3, 24, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
+    ssd1306_positiveMode();
+    ssd1306_printFixedN(128-4*12, 16, textSetMotor, STYLE_NORMAL, FONT_SIZE_2X);
+    ssd1306_printFixedN(128-12+3, 24, "%", STYLE_NORMAL, FONT_SIZE_NORMAL);
+  } else {
+    ssd1306_printFixedN(0, 16, textSetTemp, STYLE_NORMAL, FONT_SIZE_2X);
+    ssd1306_printFixedN(36+3, 24, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
+    ssd1306_negativeMode();
+    ssd1306_printFixedN(128-4*12, 16, textSetMotor, STYLE_NORMAL, FONT_SIZE_2X);
+    ssd1306_printFixedN(128-12+3, 24, "%", STYLE_NORMAL, FONT_SIZE_NORMAL);
+    ssd1306_positiveMode();
+  }
+
   ssd1306_printFixedN(60, 16, "<", STYLE_NORMAL, FONT_SIZE_NORMAL);   // icon in the middle
   ssd1306_printFixedN(60, 24, ">", STYLE_NORMAL, FONT_SIZE_NORMAL);
 
@@ -261,7 +278,7 @@ void timerAction(){
     }
   }
 
-  // assing functions according to heating state (mainly button function)
+  // assign functions according to heating state (mainly button function)
   switch(statusHeating){
     case STATE_COOLING:
     case STATE_READY:{
@@ -344,41 +361,45 @@ void timerAction(){
 
 
   // button UP increases profile on release
-  if (digitalRead(BTN_UP) && !digitalRead(BTN_DOWN)) {
+  if (!digitalRead(BTN_UP) && digitalRead(BTN_DOWN)) {
     // save that this button UP was already pressed
     buttonsPressed |= 0x01; // This might be efficient, but it's obscure. Bitwise "flags" or something...
     // What |= 0x01 does: sets the last bit to true, no matter what
     // Note: http://www.hw2sw.com/2011/09/13/arduino-bitwise-operators-and-advanced-tricks/
-  } else {
-    if (buttonsPressed & 0x01) {  // "Was I pressed in the last cycle?"
-      if (setTemperature <= MAXTEMP - 5){
-        setTemperature += 5;  
-        displayControls();
-      }
-    }
-    
+  } else if ((buttonsPressed & 0x01) && digitalRead(BTN_DOWN)) {
+    if (setTemperature <= MAXTEMP - 5){
+      setTemperature += 5;  
+      displayControls();
+    }    
     // save that this button UP was released
     buttonsPressed &= 0xFE;    
-    // ToDo: okay I'm puzzled, it's a mask for the bitwise flag thingy, I guess. 
-    // But why this huge HEX number... why not "2"... maybe to support future buttons? 
-    // what it does: "and" sets only true if both are true. wtf it actually does with the 0xFE?! black magic...
-    // 0xFE = 11111110, I see now... it sets the last bit to false
+    // what it does: "and" sets only true if both are true.
+    // since 0xFE = 11111110 last bit is false. will set to false no matter whats in the var
   }
 
   // button DOWN change profile down on release
-  if (!digitalRead(BTN_UP) && digitalRead(BTN_DOWN)) {    
+  if (digitalRead(BTN_UP) && !digitalRead(BTN_DOWN)) {    
     // save that this button DOWN was already pressed and used
     buttonsPressed |= 0x02;
-  } else {
-    if (buttonsPressed & 0x02) {
-      if (setTemperature >= MINTEMP + 5){
-        setTemperature -= 5;
-        displayControls();
-      }
-    }    
+  } else if ((buttonsPressed & 0x02) && digitalRead(BTN_UP)) {
+    if (setTemperature >= MINTEMP + 5){
+      setTemperature -= 5;
+      displayControls();
+    }
     // save that this button DOWN was released
-    buttonsPressed &= 0xFD;
+    buttonsPressed &= 0xFD; // 0xFE = 11111101
   }
+
+  // WIP both UP&DOWN are pressed and released: change mode
+  /*if ((buttonsPressed & 0x03) && !digitalRead(BTN_UP) && !digitalRead(BTN_DOWN)) {
+    if (controlMode == MODE_TEMP) {
+      controlMode = MODE_SPEED;
+    } else {
+      controlMode = MODE_TEMP;
+    }
+    displayControls();
+    buttonsPressed &= 0xFC;   // set to XXXXXX00 
+  }*/
     
 }
 
