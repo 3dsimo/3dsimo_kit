@@ -48,35 +48,9 @@ enum {
   MOTOR_REVERSE_AFTER_EXTRUSION
 } MOTOR_STATE_e;
 
-/* TODO
- *   define structure for the material list
- */
-typedef struct {
-  int temperature;
-  int motorSpeed;
-  char* materialName;
-} profile_t;
-
-/* TODO
- *   define material profiles
- */
-const profile_t materials[] PROGMEM = {  
-  // {temperature (deg. C), motorSpeed (%), materialName}
-     {0,                  0,             "OFF"},    /* NEW! BEGIN OFF - BUT IF YOU SELECT THIS AFTER PETG, 3DPEN COOLS TO 153º PRIOR TO SHUTDOWN*/
-     {210,                  40,             "PLA"},
-     {230,                  30,             "ABS"},
-     {235,                  40,             "PETG"}
-};
-
-/* TODO
- *   define number of materials in list and variables
- */
-#define MATERIAL_COUNT  4
-
 #define MAXTEMP 255         // not sure whats better: define or cont, also not sure about the actual max temp... testing with 255
 #define MINTEMP 0
 
-int materialID = 0;         // chosen material profile
 int setTemperature = 0;   // set heater temperature
 int setMotorSpeed = 40;     // set motor speed in % // hardcoded at 40% for now (will be changeable later)
                             // ToDo maybe add icrement step value (hardcoded at 5)
@@ -110,29 +84,13 @@ int getTemperature(){  // get temperature in deg. Celsius from ADU value
   return tempADU; 
 }
 
-/* TODO Change into update_display funtion. will be callled after button updown press and simply draws speed and temp
- *   load actual material profile
- *
-void loadMaterial(int id){
-  profile_t profile;
-  char text[10];
-  
-  // load material profile from PROGMEM and assign variables
-  memcpy_P(&profile, &materials[id], sizeof(profile_t));
-  setTemperature = profile.temperature; //  !!! IMPORTANT
-  setMotorSpeed  = profile.motorSpeed;
-  
-  // clear display and show all information TODO: Move
-  sprintf(text, "%d %%", setMotorSpeed);
-  ssd1306_clearScreen();
-  ssd1306_setFixedFont(ssd1306xled_font6x8);
-  ssd1306_printFixedN(0,  0, profile.materialName, STYLE_NORMAL, FONT_SIZE_2X);  
-  ssd1306_printFixedN(80, 0, text, STYLE_NORMAL, FONT_SIZE_2X);
-} */
-
+/**
+ * Updates the lower line of the display which shows the user inputs for Controls
+ * left set Temperature - center <> icon that indicates how to change mode - right set Motor Speed
+ */
 void displayControls() {
   
-  char textSetTemp[5];     // Buffer for line 2: The user Input / Controls: setTemperature and setMotorSpeed
+  char textSetTemp[5]; // Buffers for formatted control input text
   char textSetMotor[5];
   sprintf(textSetTemp,"%3d ", setTemperature);
   sprintf(textSetMotor,"%3d ",setMotorSpeed);
@@ -148,7 +106,7 @@ void displayControls() {
   ssd1306_positiveMode();
   ssd1306_printFixedN(128-4*12, 16, textSetMotor, STYLE_NORMAL, FONT_SIZE_2X);
   ssd1306_printFixedN(128-12+3, 24, "%", STYLE_NORMAL, FONT_SIZE_NORMAL);
-  ssd1306_printFixedN(60, 16, "<", STYLE_NORMAL, FONT_SIZE_NORMAL);
+  ssd1306_printFixedN(60, 16, "<", STYLE_NORMAL, FONT_SIZE_NORMAL);   // icon in the middle
   ssd1306_printFixedN(60, 24, ">", STYLE_NORMAL, FONT_SIZE_NORMAL);
 
 }
@@ -291,7 +249,7 @@ void timerAction(){
     // tolerant zone where temperature is OK for extrusion/reverse
     else if(actualTemperature > setTemperature - 10){
       statusHeating = STATE_READY;
-      ssd1306_printFixedN(128-4*12, 0, "DONE", STYLE_NORMAL, FONT_SIZE_2X);
+      ssd1306_printFixedN(128-4*12, 0, "DONE", STYLE_NORMAL, FONT_SIZE_2X);  // "DONE"... need a word with 4 chars... "REDY"?... nup
       digitalWrite(LED_NANO, HIGH);   // turn the LED on (HIGH is the voltage level)
     }
 
