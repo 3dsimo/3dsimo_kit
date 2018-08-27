@@ -280,7 +280,7 @@ void timerAction(){
   }
 
   // assign functions according to heating state (mainly button function)
-  /*switch(statusHeating){
+  switch(statusHeating){
     case STATE_COOLING:
     case STATE_READY:{
       // button EXTRUSION is pressed, extrude material
@@ -301,11 +301,11 @@ void timerAction(){
       // both buttons are pressed, motor stopped
       else if(!digitalRead(BTN_EXT) && !digitalRead(BTN_REV)){
         stateMotor = MOTOR_STOP;
-        buttonsPressed |= B00001100;
+        // buttonsPressed |= B00001100;
       }
       
-      // not buttons are pressed
-      else{
+      // no buttons are pressed
+      else {
         buttonsPressed &= B11110011;
         if(lastMotorState == MOTOR_EXTRUSION){
           stateMotor = MOTOR_REVERSE_AFTER_EXTRUSION;
@@ -321,7 +321,7 @@ void timerAction(){
       analogWrite(MOTOR_PWM, 0);
       stateMotor = MOTOR_STOP;
       break;
-  }*/
+  }
 
   // resolve motor states (Extrusion, Reverse, Stop, ...)
   switch(stateMotor){
