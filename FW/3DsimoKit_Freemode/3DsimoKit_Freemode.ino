@@ -250,7 +250,7 @@ void timerAction(){
   static char statusHeating = STATE_HEATING;   
   static char stateMotor = MOTOR_STOP, lastMotorState = MOTOR_STOP;
   static int timeMotorReverse = 0;
-  static byte buttonsPressed = B00000000; // an 8 bit number, that stores the states of the buttons as flags in the last 4 bits (1,2,4,8) = UP, DOWN, EXT, REV
+  static char buttonsPressed = 0; // an 8 bit number, that stores the states of the buttons as flags in the last 4 bits (1,2,4,8) = UP, DOWN, EXT, REV
 
   // decide temperature state (heating, cooling, ready) and show it on display
   if(++elapsedTime==2){ // 100ms
@@ -365,40 +365,43 @@ void timerAction(){
   // one time action, mainly for material change
 
   // The Mode Control Buttons                             (note: buttons are LOW/0/false when PRESSED!)
-  // UP && DOWN are pressed
-  if(!digitalRead(BTN_UP) && !digitalRead(BTN_DOWN)) {    // Are both Buttons down?
-    if (buttonsPressed & B00000011 == B00000000) {        // was I pressed in the LAST cycle? = onRelease
+  //
+  //// UP && DOWN are pressed
+  if(!digitalRead(BTN_UP) && !digitalRead(BTN_DOWN)) {    // Are both Buttons pressed?
+    
+    if ((~buttonsPressed & B10000000)) {                  // was I NOT pressed in the LAST cycle? = on time only
       if (controlMode == MODE_TEMP) {
         controlMode = MODE_SPEED;
       } else {
         controlMode = MODE_TEMP;
       }
-    }
-    buttonsPressed |= B00000011;                          // set both buttons to "pressed"
-  
+      displayControls();
+   }
+   buttonsPressed |= B10000000;                           // set both buttons to "was pressed", new flag instead of 00000011!
+
   } else { // else = not BOTH are pressed at the same time -> UP || DOWN || NONE
-    digitalWrite(LED_NANO, LOW);
-    // UP Button on Release Action
+    
+    buttonsPressed &= B01111111;                          // BOTH release
+    
+    //// UP Button on Release Action
     if(!digitalRead(BTN_UP)) {                            // if UP pressed
       buttonsPressed |= B00000001;                        // set UP to pressed
     } else {
-      if (buttonsPressed & B00000001 == B00000000) {      // was I pressed in the LAST cycle? = onRelease
-        digitalWrite(LED_NANO, HIGH); // BUG: the ifs work, the buttonPressed does not
-        delay(200);
+      if ((buttonsPressed & B00000001) && digitalRead(BTN_DOWN)) {      // was I pressed in the LAST cycle? = onRelease
         if (setTemperature <= MAXTEMP - 5){
           setTemperature += 5;  
           displayControls();
         }
       }
-      buttonsPressed &= B11111110;                        // set DOWN to released
+      buttonsPressed &= B11111110;                        // set UP to released
     }
     
-    // DOWN Button on Release action
+    //// DOWN Button on Release action
     if(!digitalRead(BTN_DOWN)) {                          // if DOWN pressed
       buttonsPressed |= B00000010;                        // set DOWN to pressed
     } else {
-      if (buttonsPressed & B00000010 == B00000000) {      // was I pressed in the LAST cycle? = onRelease
-        if (setTemperature >= MINTEMP + 5){
+      if ((buttonsPressed & B00000010) && digitalRead(BTN_UP)) {      // was I pressed in the LAST cycle? = onRelease
+        if (setTemperature >= MINTEMP + 5) {
           setTemperature -= 5;
           displayControls();
         }
@@ -406,10 +409,8 @@ void timerAction(){
       buttonsPressed &= B11111101;                        // set DOWN to released
     }
     
-    // NONE is pressed.. wait, no code. the elses above should handle the release of BOTH press?
-    //  will they fire single button-events after release of BOTH? yes? -> idea: "if (buttonsPressed & B00000011..." in UP and DOWN
-    
   } // end of if-UP&&DOWN-are-pressed-else...
+  
     
 }
 
