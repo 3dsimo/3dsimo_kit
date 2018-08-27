@@ -250,6 +250,7 @@ void timerAction(){
   static char statusHeating = STATE_HEATING;   
   static char stateMotor = MOTOR_STOP, lastMotorState = MOTOR_STOP;
   static int timeMotorReverse = 0;
+  static byte buttonsPressed = 0; // an 8 bit number, that stores the states of the buttons as flags in the last 4 bits (1,2,4,8) = UP, DOWN, EXT, REV
 
   // decide temperature state (heating, cooling, ready) and show it on display
   if(++elapsedTime==2){ // 100ms
@@ -285,21 +286,27 @@ void timerAction(){
       // button EXTRUSION is pressed, extrude material
       if(!digitalRead(BTN_EXT) && digitalRead(BTN_REV)){
         stateMotor = MOTOR_EXTRUSION;
+        buttonsPressed |= B00000100;  // yes, the Hex values are shorter and quicker to write. 
+        buttonsPressed &= B11110111;  // But I spent too much time in the calculator app and it's extremely hard to debug      
       }
       
       // button REVERSE is pressed, retract material
       else if(digitalRead(BTN_EXT) && !digitalRead(BTN_REV)){
         stateMotor = MOTOR_REVERSE;
         timeMotorReverse = 400; // reverse time is 50ms * timeMotorReverse (400 = 20s)
+        buttonsPressed |= B00001000; // press of btn REV
+        buttonsPressed &= B11111011; // release of btn EXT
       }
       
       // both buttons are pressed, motor stopped
       else if(!digitalRead(BTN_EXT) && !digitalRead(BTN_REV)){
         stateMotor = MOTOR_STOP;
+        buttonsPressed |= B00001100;
       }
       
       // not buttons are pressed
       else{
+        buttonsPressed &= B11110011;
         if(lastMotorState == MOTOR_EXTRUSION){
           stateMotor = MOTOR_REVERSE_AFTER_EXTRUSION;
           timeMotorReverse = 20; // reverse time is 50ms * timeMotorReverse (20 = 1s)
@@ -353,41 +360,39 @@ void timerAction(){
       }  
       break;        
   }
-  lastMotorState = stateMotor;  
   
+  lastMotorState = stateMotor;    
   // one time action, mainly for material change
-  static char buttonsPressed = 0;
 
 
-
-  // button UP increases profile on release
+  // button UP increases temperature/speed on release
   if (!digitalRead(BTN_UP) && digitalRead(BTN_DOWN)) {
     // save that this button UP was already pressed
-    buttonsPressed |= 0x01; // This might be efficient, but it's obscure. Bitwise "flags" or something...
+    buttonsPressed |= B00000001; // This might be efficient, but it's obscure. Bitwise "flags" or something...
     // What |= 0x01 does: sets the last bit to true, no matter what
     // Note: http://www.hw2sw.com/2011/09/13/arduino-bitwise-operators-and-advanced-tricks/
-  } else if ((buttonsPressed & 0x01) && digitalRead(BTN_DOWN)) {
+  } else if ((buttonsPressed & B00000001) && digitalRead(BTN_DOWN)) {
     if (setTemperature <= MAXTEMP - 5){
       setTemperature += 5;  
       displayControls();
     }    
     // save that this button UP was released
-    buttonsPressed &= 0xFE;    
+    buttonsPressed &= B11111110;    
     // what it does: "and" sets only true if both are true.
     // since 0xFE = 11111110 last bit is false. will set to false no matter whats in the var
   }
 
-  // button DOWN change profile down on release
+  // button DOWN cdecreases temperature/speed on release
   if (digitalRead(BTN_UP) && !digitalRead(BTN_DOWN)) {    
     // save that this button DOWN was already pressed and used
-    buttonsPressed |= 0x02;
-  } else if ((buttonsPressed & 0x02) && digitalRead(BTN_UP)) {
+    buttonsPressed |= B00000010;
+  } else if ((buttonsPressed & B00000010) && digitalRead(BTN_UP)) {
     if (setTemperature >= MINTEMP + 5){
       setTemperature -= 5;
       displayControls();
     }
     // save that this button DOWN was released
-    buttonsPressed &= 0xFD; // 0xFE = 11111101
+    buttonsPressed &= B11111101;
   }
 
   // WIP both UP&DOWN are pressed and released: change mode
