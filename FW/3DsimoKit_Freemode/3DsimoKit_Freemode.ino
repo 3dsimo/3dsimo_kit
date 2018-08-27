@@ -388,10 +388,17 @@ void timerAction(){
       buttonsPressed |= B00000001;                        // set UP to pressed
     } else {
       if ((buttonsPressed & B00000001) && digitalRead(BTN_DOWN)) {      // was I pressed in the LAST cycle? = onRelease
-        if (setTemperature <= MAXTEMP - 5){
-          setTemperature += 5;  
-          displayControls();
+        if (controlMode == MODE_TEMP) {
+          if (setTemperature <= MAXTEMP - 5){
+            setTemperature += 5;  
+            displayControls();
+          }
+        } else {
+          if (setMotorSpeed <= 100 - 5) {
+            setMotorSpeed += 5;            
+          }
         }
+        displayControls();
       }
       buttonsPressed &= B11111110;                        // set UP to released
     }
@@ -401,10 +408,16 @@ void timerAction(){
       buttonsPressed |= B00000010;                        // set DOWN to pressed
     } else {
       if ((buttonsPressed & B00000010) && digitalRead(BTN_UP)) {      // was I pressed in the LAST cycle? = onRelease
-        if (setTemperature >= MINTEMP + 5) {
-          setTemperature -= 5;
-          displayControls();
+        if (controlMode == MODE_TEMP) {
+          if (setTemperature >= MINTEMP + 5) {
+            setTemperature -= 5;
+          }
+        } else {
+          if (setMotorSpeed >= 0 +5) {
+            setMotorSpeed -= 5;            
+          }
         }
+        displayControls();
       }
       buttonsPressed &= B11111101;                        // set DOWN to released
     }
