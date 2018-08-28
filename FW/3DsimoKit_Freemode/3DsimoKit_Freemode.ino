@@ -39,6 +39,7 @@ enum {
   STATE_HEATING,
   STATE_COOLING,
   STATE_READY,
+  STATE_OFF
 } STATE_e;
 
 enum {
@@ -54,13 +55,14 @@ enum {
   MODE_SPEED
 } MODE_CONTROL_e;
 
-#define MAXTEMP 255         // not sure whats better: define or cont, also not sure about the actual max temp... testing with 255
-#define MINTEMP 0
+#define MAXTEMP 300         // not sure whats better: define or const, also not sure about the actual max temp... testing with 300
+#define MINTEMP 155         // 153/154 is the lowest measurement possible. actual temperature can be lower. 
+                            // We can use this to put heater in off mode (COOLING) if we choose "150°C" aka "LOW". However: hot temperatures will start at 155°C
 
-int setTemperature = 0;         // set heater temperature
-int setMotorSpeed = 40;         // set motor speed in % // hardcoded at 40% for now (will be changeable later)
+int setTemperature = 0;         // set heater temperature (we raise this directly to "155" when up button is pressed once. and drop it down to "0" if the user goes below "155")
+int setMotorSpeed = 40;         // set motor speed in %
                                 // ToDo maybe add icrement step value (hardcoded at 5)
-char controlMode = MODE_TEMP;   // ToDo: maybe not global... somewhere static?
+char controlMode = MODE_TEMP;   // Control Mode: MODE_TEMP or MODE_SPEED. selects which values the UP-DOWN buttons change
 
 /*
  *   create timer for main loop
@@ -99,7 +101,12 @@ void displayControls() {
   
   char textSetTemp[5]; // Buffers for formatted control input text
   char textSetMotor[5];
-  sprintf(textSetTemp,"%3d ", setTemperature);
+  if (setTemperature >= MINTEMP) {
+    sprintf(textSetTemp,"%3d ", setTemperature);
+  } else {
+    sprintf(textSetTemp,"OFF ");
+  }
+  
   sprintf(textSetMotor,"%3d ",setMotorSpeed);
   
   // clear display and show all information
@@ -221,7 +228,11 @@ int heating(){
   sumTemp /= NO_AVERAGES_VALUES;
 
   // show on display actual and preset temperature
-  sprintf(text, "%3d ", sumTemp);
+  if (sumTemp >= MINTEMP) {
+    sprintf(text, "%3d ", sumTemp);
+  } else {
+    sprintf(text, "LOW ");
+  }  
   ssd1306_setFixedFont(ssd1306xled_font6x8);
   ssd1306_printFixedN(0, 0, text, STYLE_NORMAL, FONT_SIZE_2X);
   ssd1306_printFixedN(36+3, 8, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
@@ -256,10 +267,18 @@ void timerAction(){
   if(++elapsedTime==2){ // 100ms
     elapsedTime = 0;
     int actualTemperature = heating();
+    if (actualTemperature < 155) {
+      actualTemperature = 30; // doesn't really matter, but high enough above "0"
+    }
     
     // tolerant zone where temperature is ABOVE preset temperature, 
     // but it is possible to do extrusion/reverse
-    if(actualTemperature > setTemperature + 10){
+    if (setTemperature < 155) {
+      statusHeating = STATE_OFF;
+      ssd1306_printFixedN(128-4*12, 0, "OFF!", STYLE_NORMAL, FONT_SIZE_2X);
+    }
+    
+    else if(actualTemperature > setTemperature + 10){
       statusHeating = STATE_COOLING;
       ssd1306_printFixedN(128-4*12, 0, "COOL", STYLE_NORMAL, FONT_SIZE_2X);
     }
@@ -268,7 +287,6 @@ void timerAction(){
     else if(actualTemperature > setTemperature - 10){
       statusHeating = STATE_READY;
       ssd1306_printFixedN(128-4*12, 0, "DONE", STYLE_NORMAL, FONT_SIZE_2X);  // "DONE"... need a word with 4 chars... "REDY"?... nup
-      //DEBUG digitalWrite(LED_NANO, HIGH);   // turn the LED on (HIGH is the voltage level)
     }
 
     // tolerant zone where temperature is LOW for extrusion/reverse
@@ -314,7 +332,7 @@ void timerAction(){
       }    
       break;
     }
-    
+    case STATE_OFF:
     case STATE_HEATING:
       // if happened that heater has so low temperature, motor stop
       digitalWrite(MOTOR_DIR, LOW);
@@ -389,16 +407,17 @@ void timerAction(){
     } else {
       if ((buttonsPressed & B00000001) && digitalRead(BTN_DOWN)) {      // was I pressed in the LAST cycle? = onRelease
         if (controlMode == MODE_TEMP) {
-          if (setTemperature <= MAXTEMP - 5){
-            setTemperature += 5;  
-            displayControls();
+          if (setTemperature == 0) {
+            setTemperature = MINTEMP;
+          } else if (setTemperature <= MAXTEMP - 5){
+            setTemperature += 5;
           }
         } else {
           if (setMotorSpeed <= 100 - 5) {
             setMotorSpeed += 5;            
           }
         }
-        displayControls();
+        displayControls(); // updates display, even when there are no changes... TODO?
       }
       buttonsPressed &= B11111110;                        // set UP to released
     }
@@ -409,7 +428,9 @@ void timerAction(){
     } else {
       if ((buttonsPressed & B00000010) && digitalRead(BTN_UP)) {      // was I pressed in the LAST cycle? = onRelease
         if (controlMode == MODE_TEMP) {
-          if (setTemperature >= MINTEMP + 5) {
+          if (setTemperature == MINTEMP) {
+            setTemperature = 0;
+          } else if (setTemperature >= MINTEMP + 5) {
             setTemperature -= 5;
           }
         } else {
