@@ -19,3 +19,9 @@ Freely set Temperature and Motor Speed.
 - Lower Left: Target temperaturen. (0 to 254°C (placeholder))
 - Lower Right: Motor Speed setting. (0 - 100 %)
 - Lower Middle: Icon that indicates how to change mode.
+
+### Work in Progress
+- Default Settings, Min and Max Settings are Placeholders. e.g.: It does not make sense to keep 0°C as Minimum Temperature.
+- There is an [issue that the measured temperature on the display never shows below 153°C](https://github.com/3dsimo/3dsimo_kit/issues/4). The actual temperature can be below 153 degrees. This value, however, also drives the heating wich means that the pen thinks that set values like 70°C are already exceeded with 153°C (while, in reality, the tip doesn't heat at all).
+- When using Up AND Down to switch between control modes: It can happen that you accidentally change the value due to single-button-presses. I will test it myself and if it is annoying I might try to prevent them.
+- There might be bugs.
