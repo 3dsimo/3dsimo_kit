@@ -2,6 +2,8 @@
 ### Alternative Control scheme for the 3Dsimo Kit pen
 
 Freely set Temperature and Motor Speed.
+[How to change the firmware on the 3Dsimo Kit Pen.](../../documents/pdf/HW_FW_manualEN.pdf)
+
 #### Buttons:
 - Extrude Pressed: extrudes filament (when hot).
 - Extrude Release: Filament will be pulled back slightly.
