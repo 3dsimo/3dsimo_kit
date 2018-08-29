@@ -36,7 +36,7 @@ Freely set Temperature and Motor Speed. For right-handed use, see below how to c
 - see line 462
 - This will rotate the display and change the UP and DOWN buttons to fit the display reading direction.
 
-### Work in Progress
-- When using Up AND Down to switch between control modes: It can happen that you accidentally change the value due to single-button-presses. I will test it myself and if it is annoying I might try to prevent them.
-- There might be bugs. 🐞
 
+  
+  
+There might be bugs. 🐞
