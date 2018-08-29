@@ -27,8 +27,8 @@ Freely set Temperature and Motor Speed. For right-handed use, see below how to c
 - ⚠️ WARNING: "LOW" or "OFF!" does not indicate that the nozzle IS cold. It needs some time to cool down, even if LOW is diplayed.
 - [The temperature measurement can't go below 153°C on an unmodified 3Dsimo Kit](https://github.com/3dsimo/3dsimo_kit/issues/4).
 - Freemode will start in OFF mode. Extruding is prevented and the pen tries to cool down to target 0°C.
-- Increasing the Temperature one step with the UP button will directly set 155°C as target temperature and the pen heats up. If the pen reaches 155°C and more, it will display the actual temperature (might take a while).
-- In reverse: Going one step DOWN from 155°C target temperature will set 0°C as next target. The heater will turn OFF. As soon as the actual, measured temperature falls below 155°C it will diplay "LOW". ⚠️ TAKE CARE!! 154°C is still pretty hot to the touch! Colling down takes a while, too.
+- Increasing the Temperature one step with the UP button will directly set 155°C as target temperature and the pen heats up. If the pen reaches 155°C and more, it will display the actual temperature (might take a moment).
+- In reverse: Going one step DOWN from 155°C target temperature will set 0°C as next target. The heater will turn OFF. As soon as the actual, measured temperature falls below 155°C it will diplay "LOW". ⚠️ TAKE CARE!! 154°C is still pretty hot to the touch! Cooling down takes a while, too.
 
 #### Left-handed use:
 - It is easy to change the code to left-hand mode. Just follow those lines:
