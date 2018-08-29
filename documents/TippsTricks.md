@@ -30,9 +30,12 @@ But it is still a good idea to have some tools nearby: cutter knife, soldering i
 ### Drawing tipps
 - Take your time to get a feeling for your pen and your material. Temperature and speed both change the behaviour of the material.
 - With a low temperature and a steady hand you can actually draw in the air.
-- It is, of course, easier to build up your shapes or to assemble single pieces.
-- You will probably need a surface to draw on. Try to find one, where the filament sticks well. You can also use clear tape as a basic surface.
-- You can use a transparent surface to draw "on" a sketch or template.
+- ... it is, of course, easier to build up your shapes or to assemble single pieces.
+- You will probably need a surface to draw on. [You can find a perfect Drawing Pad in the 3Dsimo Shop](https://3dsimo.com/eshop/kit/accessories/drawing-pad). As a makeshift surface for doodling you can even use paper, cardboard or something covered with adhesive tape. Just don't use anything that melts in high temperatures...
+- You can use a transparent surface to draw "on" a sketch or template below.
+- You can also use common household-items covered in adhesive tape as a base for a shape. 
+- [3Dsimo offers a Silicone Pad that helps you to draw perfect circles and lines.](https://3dsimo.com/eshop/kit/accessories/silicone-drawing-pad)
+- When drawing curves it is sometimes easier to rotate the surface, instead of rotating your pen and arm.
 - Filament will be extruded as long as you hold the extrude button. Release the button to stop the flow. Release the button between two strokes that are not supposed to be connected.
 - After you release the extrude button the motor will pull back the filament into the pen. This helps to prevent strings and hairs of material after every stroke. Make sure to hold the pen at the end of each stroke. If you pull it away before releasing the button, you will pull the material along, creating thin "hairs".
 - Depending on your type of filament you might need multiple layers for a solid and stable shape.
@@ -42,6 +45,6 @@ But it is still a good idea to have some tools nearby: cutter knife, soldering i
   - Slowly drawing lines in the air.
   - Use a base shape to draw on. You can cover it with clear tape for a better grip. Make sure the material of the base is heat resistant.
 - The filament cools down fairly fast after extrusion. With a bit of practice you can correct and bend it before it cools down completely.
-- After you finish your piece of art, you probably need scissors or a clipper to remove thin hairs of filament. Get used to them, it's hard to avoid it completely.
+- After you finish your piece of art, you probably need scissors or a clipper to remove thin hairs of filament. Get used to them, it's hard to avoid it completely. Alternatively you can hold the hot tip to the filament hairs to melt them away.
 - Depending on your type of material you might be able to melt, bend and shape it with a hot hair dryer. e.g. you can draw a flat rectangle and bend it into a ring.
 - Depending on your material you might also be able to file, clip, cut or polish the piece. Careful: Some type of filament tends to break.
