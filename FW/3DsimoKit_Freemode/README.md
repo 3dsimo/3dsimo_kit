@@ -1,9 +1,9 @@
 # FREEMODE
 ### Alternative Control scheme for the 3Dsimo Kit pen
 
-Freely set Temperature and Motor Speed. For right-handed use.   
+Freely set Temperature and Motor Speed. For right-handed use, see below how to change for left-hand.   
 [How to change the firmware on the 3Dsimo Kit Pen.](../../documents/pdf/HW_FW_manualEN.pdf)  
-⚠️ Be very careful when setting the temperature and speed. Wrong settings can damage the nozzle. Take the profile settings from the official firmware as a starting point (notice how the speed is around 40%). If the heat is too low and the speed is too high your nozzle can overflow! ⚠️
+⚠️ Be very careful when setting the temperature and speed. Wrong settings can damage the nozzle. Use the profile settings from the official firmware as a starting point (notice how the speed is around 40%). If the heat is too low and the speed is too high your nozzle can overflow! ⚠️
 
 #### Buttons:
 - Extrude Pressed: extrudes filament (when hot).
@@ -27,11 +27,16 @@ Freely set Temperature and Motor Speed. For right-handed use.
 - ⚠️ WARNING: "LOW" or "OFF!" does not indicate that the nozzle IS cold. It needs some time to cool down, even if LOW is diplayed.
 - [The temperature measurement can't go below 153°C on an unmodified 3Dsimo Kit](https://github.com/3dsimo/3dsimo_kit/issues/4).
 - Freemode will start in OFF mode. Extruding is prevented and the pen tries to cool down to target 0°C.
-- Increasing the Temperature one step with the UP button will directly set 155°C as target temperature and the pen heats up. If the pen reaches 155°C and more, it will display the actual temperature (might take a while).
-- In reverse: Going one step DOWN from 155°C target temperature will set 0°C as next target. The heater will turn OFF. As soon as the actual, measured temperature falls below 155°C it will diplay "LOW". ⚠️ TAKE CARE!! 154°C is still pretty hot to the touch! Colling down takes a while, too.
+- Increasing the Temperature one step with the UP button will directly set 155°C as target temperature and the pen heats up. If the pen reaches 155°C and more, it will display the actual temperature (might take a moment).
+- In reverse: Going one step DOWN from 155°C target temperature will set 0°C as next target. The heater will turn OFF. As soon as the actual, measured temperature falls below 155°C it will diplay "LOW". ⚠️ TAKE CARE!! 154°C is still pretty hot to the touch! Cooling down takes a while, too.
+
+#### Left-handed use:
+- It is easy to change the code to left-hand mode. Just follow those lines:
+- see line 24
+- see line 462
+- This will rotate the display and change the UP and DOWN buttons to fit the display reading direction.
 
 ### Work in Progress
 - When using Up AND Down to switch between control modes: It can happen that you accidentally change the value due to single-button-presses. I will test it myself and if it is annoying I might try to prevent them.
-- There might be bugs.
-- I will probably write a few lines for Left-handed users.
+- There might be bugs. 🐞
 
