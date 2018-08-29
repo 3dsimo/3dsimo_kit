@@ -1,9 +1,8 @@
 /*
- * WIP - A alternative control mode that does not use predefined material profiles. 
- * But allows de-/increasing the temperature in steps of 5, from 0 to maximum.
- * Later: UP and DOWN pressed together: change control mode to set motor speed the same way
+ * An alternative control mode that does not use predefined material profiles. 
+ * But allows de-/increasing the temperature and speed in steps of 5
+ * UP and DOWN pressed together: change control mode to switch between speed and temperature
  * Therefore the Up-Down-Buttons need to do their thing On Release (not while pressed)
- * my Comments are just my personal notes...
  */
 
 /*
@@ -22,9 +21,11 @@
 
 #define BTN_UP      12    // controlling button UP/PLUS    // pin 11 & 12 changed for right hand use
 #define BTN_DOWN    11    // controlling button DOWN/MINUS
+/* LEFT-HAND: uncomment the two lines below, comment away the two lines above! */
+// #define BTN_UP      11    // controlling button UP/PLUS
+// #define BTN_DOWN    12    // controlling button DOWN/MINUS
 #define BTN_EXT     8     // button for material extrusion
 #define BTN_REV     7     // button for material reverse
-
 #define MOTOR_DIR   6     // motor direction output
 #define MOTOR_PWM   10    // motor PWM output for power driving
 #define MOTOR_SLEEP 5
@@ -55,7 +56,7 @@ enum {
   MODE_SPEED
 } MODE_CONTROL_e;
 
-#define MAXTEMP 300         // not sure whats better: define or const, also not sure about the actual max temp... testing with 300
+#define MAXTEMP 255         // not sure whats better: define or const, also not sure about the actual max temp... testing with 300
 #define MINTEMP 155         // 153/154 is the lowest measurement possible. actual temperature can be lower. 
                             // We can use this to put heater in off mode (COOLING) if we choose "150°C" aka "LOW". However: hot temperatures will start at 155°C
 
@@ -113,7 +114,6 @@ void displayControls() {
   ssd1306_clearScreen();
   ssd1306_setFixedFont(ssd1306xled_font6x8);
 
-  // TODO: change Selection (negativeMode) according to ControlMode
   if (controlMode == MODE_TEMP) {
     ssd1306_negativeMode();
     ssd1306_printFixedN(0, 16, textSetTemp, STYLE_NORMAL, FONT_SIZE_2X);
@@ -201,7 +201,7 @@ int heating(){
   static int tempAvg[NO_AVERAGES_VALUES];   // temperature array for averaging it
   static int tempAvgIter = 0;               // current index in temperature array
   static char firstTime = 0;                // if is 1, this function ran at least one time
-  char text[5];                            // buffer for text
+  char text[5];                             // buffer for text
 
   // variables initialization
   if(!firstTime){
@@ -211,7 +211,7 @@ int heating(){
 
   // resolve PID value for heater PWM
   int temperature = getTemperature();
-  int valuePID = getPIDoutput(setTemperature, temperature, 255, 0); // !!! IMPORTANT
+  int valuePID = getPIDoutput(setTemperature, temperature, 255, 0);
    
   analogWrite(HEATER_EN, valuePID);
 
@@ -319,12 +319,12 @@ void timerAction(){
       // both buttons are pressed, motor stopped
       else if(!digitalRead(BTN_EXT) && !digitalRead(BTN_REV)){
         stateMotor = MOTOR_STOP;
-        // buttonsPressed |= B00001100;
+        buttonsPressed |= B01000000;
       }
       
       // no buttons are pressed
       else {
-        buttonsPressed &= B11110011;
+        buttonsPressed &= B10110011;
         if(lastMotorState == MOTOR_EXTRUSION){
           stateMotor = MOTOR_REVERSE_AFTER_EXTRUSION;
           timeMotorReverse = 20; // reverse time is 50ms * timeMotorReverse (20 = 1s)
@@ -382,8 +382,9 @@ void timerAction(){
   lastMotorState = stateMotor;    
   // one time action, mainly for material change
 
-  // The Mode Control Buttons                             (note: buttons are LOW/0/false when PRESSED!)
-  //
+
+  // The Mode Control Buttons
+  // (note: buttons are LOW/0/false when PRESSED!)
   //// UP && DOWN are pressed
   if(!digitalRead(BTN_UP) && !digitalRead(BTN_DOWN)) {    // Are both Buttons pressed?
     
@@ -405,7 +406,7 @@ void timerAction(){
     if(!digitalRead(BTN_UP)) {                            // if UP pressed
       buttonsPressed |= B00000001;                        // set UP to pressed
     } else {
-      if ((buttonsPressed & B00000001) && digitalRead(BTN_DOWN)) {      // was I pressed in the LAST cycle? = onRelease
+      if ((buttonsPressed & B00000001) && digitalRead(BTN_DOWN)) {  // was I pressed in the LAST cycle? = onRelease
         if (controlMode == MODE_TEMP) {
           if (setTemperature == 0) {
             setTemperature = MINTEMP;
@@ -417,7 +418,7 @@ void timerAction(){
             setMotorSpeed += 5;            
           }
         }
-        displayControls(); // updates display, even when there are no changes... TODO?
+        displayControls();
       }
       buttonsPressed &= B11111110;                        // set UP to released
     }
@@ -426,7 +427,7 @@ void timerAction(){
     if(!digitalRead(BTN_DOWN)) {                          // if DOWN pressed
       buttonsPressed |= B00000010;                        // set DOWN to pressed
     } else {
-      if ((buttonsPressed & B00000010) && digitalRead(BTN_UP)) {      // was I pressed in the LAST cycle? = onRelease
+      if ((buttonsPressed & B00000010) && digitalRead(BTN_UP)) {  // was I pressed in the LAST cycle? = onRelease
         if (controlMode == MODE_TEMP) {
           if (setTemperature == MINTEMP) {
             setTemperature = 0;
@@ -458,8 +459,10 @@ void setup() {
   // initialize OLED display
   ssd1306_128x32_i2c_init();
   ssd1306_clearScreen();
+  /*  LEFT-HAND: comment away the two lines below! */
   ssd1306_flipHorizontal(1);  /* oled_ssd1306.h   NEW! rotate screen in X */
   ssd1306_flipVertical(1);   /* oled_ssd1306.h   NEW!  rotate screen in Y */
+  
   
 
   // initialize outputs 
@@ -475,7 +478,7 @@ void setup() {
   pinMode(BTN_EXT,  INPUT_PULLUP);
   pinMode(BTN_REV,  INPUT_PULLUP);
 
-  displayControls(); // setMotor&Temp should work globally, only display remains
+  displayControls();
 
   // preset timer period every 50 ms and call timerAction function when time expire
   timer.Every(50, timerAction);
