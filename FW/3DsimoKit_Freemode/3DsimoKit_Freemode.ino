@@ -400,13 +400,11 @@ void timerAction(){
 
   } else { // else = not BOTH are pressed at the same time -> UP || DOWN || NONE
     
-    buttonsPressed &= B01111111;                          // BOTH release
-    
     //// UP Button on Release Action
     if(!digitalRead(BTN_UP)) {                            // if UP pressed
       buttonsPressed |= B00000001;                        // set UP to pressed
     } else {
-      if ((buttonsPressed & B00000001) && digitalRead(BTN_DOWN)) {  // was I pressed in the LAST cycle? = onRelease
+      if (!(buttonsPressed & B10000000) && (buttonsPressed & B00000001) && digitalRead(BTN_DOWN)) {  // was I pressed in the LAST cycle? = onRelease
         if (controlMode == MODE_TEMP) {
           if (setTemperature == 0) {
             setTemperature = MINTEMP;
@@ -427,7 +425,7 @@ void timerAction(){
     if(!digitalRead(BTN_DOWN)) {                          // if DOWN pressed
       buttonsPressed |= B00000010;                        // set DOWN to pressed
     } else {
-      if ((buttonsPressed & B00000010) && digitalRead(BTN_UP)) {  // was I pressed in the LAST cycle? = onRelease
+      if (!(buttonsPressed & B10000000) && (buttonsPressed & B00000010) && digitalRead(BTN_UP)) {  // was I pressed in the LAST cycle? = onRelease
         if (controlMode == MODE_TEMP) {
           if (setTemperature == MINTEMP) {
             setTemperature = 0;
@@ -442,6 +440,11 @@ void timerAction(){
         displayControls();
       }
       buttonsPressed &= B11111101;                        // set DOWN to released
+    }
+
+    //// NONE
+    if (digitalRead(BTN_UP) && digitalRead(BTN_DOWN)) {
+      buttonsPressed &= B01111111;                          // BOTH release
     }
     
   } // end of if-UP&&DOWN-are-pressed-else...
