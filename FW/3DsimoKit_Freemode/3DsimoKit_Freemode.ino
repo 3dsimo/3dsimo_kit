@@ -56,6 +56,7 @@ enum {
   MODE_SPEED
 } MODE_CONTROL_e;
 
+#define MAXSPEED 60         // for safety. change this up to 100 (%), if you know what you are doing.
 #define MAXTEMP 255         // not sure whats better: define or const, also not sure about the actual max temp... testing with 300
 #define MINTEMP 155         // 153/154 is the lowest measurement possible. actual temperature can be lower. 
                             // We can use this to put heater in off mode (COOLING) if we choose "150°C" aka "LOW". However: hot temperatures will start at 155°C
@@ -412,7 +413,7 @@ void timerAction(){
             setTemperature += 5;
           }
         } else {
-          if (setMotorSpeed <= 100 - 5) {
+          if (setMotorSpeed <= MAXSPEED - 5) {
             setMotorSpeed += 5;            
           }
         }
