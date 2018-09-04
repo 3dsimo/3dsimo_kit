@@ -2,7 +2,9 @@
 ### Alternative Control scheme for the 3Dsimo Kit pen
 
 Freely set Temperature and Motor Speed. For right-handed use, see below how to change for left-hand.   
+Download or copy the [3DsimoKit_Freemode.ino](3DsimoKit_Freemode.ino) file and...  
 [How to change the firmware on the 3Dsimo Kit Pen.](../../documents/pdf/HW_FW_manualEN.pdf)  
+
 ⚠️ Be very careful when setting the temperature and speed. Wrong settings can damage the nozzle. Use the profile settings from the official firmware as a starting point (notice how the speed is around 40%). If the heat is too low and the speed is too high your nozzle can overflow! ⚠️ As a precaution the maximum speed is limited to 60%. You can change MAXSPEED in line ~59.
 
 #### Buttons:
@@ -33,7 +35,7 @@ Freely set Temperature and Motor Speed. For right-handed use, see below how to c
 #### Left-handed use:
 - It is easy to change the code to left-hand mode. Just follow those lines:
 - see line 24
-- see line 462
+- see line 466
 - This will rotate the display and change the UP and DOWN buttons to fit the display reading direction.
 
 
