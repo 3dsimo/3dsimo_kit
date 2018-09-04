@@ -3,7 +3,7 @@
 
 Freely set Temperature and Motor Speed. For right-handed use, see below how to change for left-hand.   
 [How to change the firmware on the 3Dsimo Kit Pen.](../../documents/pdf/HW_FW_manualEN.pdf)  
-⚠️ Be very careful when setting the temperature and speed. Wrong settings can damage the nozzle. Use the profile settings from the official firmware as a starting point (notice how the speed is around 40%). If the heat is too low and the speed is too high your nozzle can overflow! ⚠️
+⚠️ Be very careful when setting the temperature and speed. Wrong settings can damage the nozzle. Use the profile settings from the official firmware as a starting point (notice how the speed is around 40%). If the heat is too low and the speed is too high your nozzle can overflow! ⚠️ As a precaution the maximum speed is limited to 60%. You can change MAXSPEED in line ~59.
 
 #### Buttons:
 - Extrude Pressed: extrudes filament (when hot).
@@ -20,7 +20,7 @@ Freely set Temperature and Motor Speed. For right-handed use, see below how to c
 - Upper line Right: State of the nozzle: HEAT, COOL, DONE, OFF!. You can only extrude in done or cooling states.
 - Lower line: User input settings. Selected mode is shown inverted.
 - Lower Left: Target temperatures: "LOW", 155 - 255
-- Lower Right: Motor Speed setting. (0 - 100 %)
+- Lower Right: Motor Speed setting: 0 - 60 %
 - Lower Middle: Icon that indicates how to change mode.
 
 #### OFF mode:
