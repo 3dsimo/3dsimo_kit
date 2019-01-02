@@ -1,7 +1,7 @@
 # Firmware for 3Dsimo Kit
 The firmware for the open source 3D pen, is available in [this repository](../FW/3DsimoKit). 
 
-Download from there the *3DsimoKit.ino* file and open it with the [Arduino IDE](http://arduino.cc/software). The code is fully available and commented so you don't have trouble finding your way around.
+Download from there the *3DsimoKit.ino* file and open it with the [Arduino IDE](https://www.arduino.cc/en/Main/Software). The code is fully available and commented so you don't have trouble finding your way around.
 
 ## Installing necessary libraries
 The code uses 2 libraries you need to install. You can do that from menu Sketch => Include Library => Manage Libraries. 
