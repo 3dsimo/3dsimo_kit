@@ -9,4 +9,4 @@ You can find all 3D models of the parts in [the 3Dmodels Folder](../3Dmodels/)
 The pen is 3D hardware, so people tweak the design of the files. You can print these different designs to change your 3Dsimo pen. 
 
 Following designs are available:
-* [Ingegno Enclosure](../3Dmodels/STL/Ingegno Enclosure Changes/)
+* [Ingegno Enclosure](../3Dmodels/STL/Ingegno%20Enclosure%20Changes/)
