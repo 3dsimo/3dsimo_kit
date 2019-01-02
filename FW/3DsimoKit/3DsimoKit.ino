@@ -1,6 +1,10 @@
-#include "ssd1306.h"
-#include "nano_gfx.h"
-#include <EveryTimer.h>
+/*
+ *  ssd1306   128x32   Alexey Dinda Library
+ *  Install via package manager 
+ */
+#include "ssd1306.h"    // ssd1306 Alexey Dynda v 1.7.12
+#include "nano_gfx.h"   // ssd1306 Alexey Dynda
+#include <EveryTimer.h> // EveryTimer by Alessio Leoncini v 1.1.1
 
 /*
  *   define Input/Outputs
@@ -8,8 +12,8 @@
 
 #define LED_NANO    13    // LED placed on Arduino Nano board
 
-#define BTN_UP      11    // controlling button UP/PLUS
-#define BTN_DOWN    12    // controlling button DOWN/MINUS
+#define BTN_UP      12    // controlling button UP/PLUS    /* changed for right hand - default 11 */
+#define BTN_DOWN    11    // controlling button DOWN/MINUS /* changed for right hand - default 12 */
 #define BTN_EXT     8     // button for material extrusion
 #define BTN_REV     7     // button for material reverse
 
@@ -20,6 +24,9 @@
 
 #define TEMP_IN     A0    // temperature measure ADC input 
 
+#define MAXCURRENTDRAW 255 // PWM max value on Heater to avoid high current draw (if wanted)
+
+bool righthanded = true;   // default on is righthanded display
 /*
  *   define heating states
  */
@@ -51,18 +58,27 @@ typedef struct {
  */
 const profile_t materials[] PROGMEM = {  
   // {temperature (deg. C), motorSpeed (%), materialName}
-     {225,                  25,             "ABS"},
-     {210,                  40,             "PLA"}
+     {0,                  0,             "OFF"},    /* NEW! BEGIN OFF - BUT IF YOU SELECT THIS AFTER PETG, 3DPEN COOLS TO 153º PRIOR TO SHUTDOWN*/
+     {210,                  40,             "PLA"},
+     {210,                  60,             "PLA"},
+     {210,                  80,             "PLA"},
+     {230,                  30,             "ABS"},
+     {230,                  50,             "ABS"},
+     {230,                  70,             "ABS"},
+     {235,                  30,             "PETG"},
+     {235,                  50,             "PETG"},
+     {235,                  70,             "PETG"}
 };
 
 /*
  *   define number of materials in list and variables
  */
-#define MATERIAL_COUNT  2
+#define MATERIAL_COUNT  10
 
-int materialID = 0;         // chosen material profile
-int setTemperature = 225;   // set heater temperature
+int materialID = 1;         // chosen material profile on startup
+int setTemperature = 210;   // set heater temperature
 int setMotorSpeed = 60;     // set motor speed in %
+bool pressUPDOWNhandled = false;
 
 /*
  *   create timer for main loop
@@ -189,7 +205,7 @@ int heating(){
 
   // resolve PID value for heater PWM
   int temperature = getTemperature();
-  int valuePID = getPIDoutput(setTemperature, temperature, 255, 0);
+  int valuePID = getPIDoutput(setTemperature, temperature, MAXCURRENTDRAW, 0);
    
   analogWrite(HEATER_EN, valuePID);
 
@@ -231,7 +247,7 @@ int heating(){
  */
 void timerAction(){
   static int elapsedTime = 0;
-  static char statusHeating = STATE_HEATING;
+  static char statusHeating = STATE_HEATING;   
   static char stateMotor = MOTOR_STOP, lastMotorState = MOTOR_STOP;
   static int timeMotorReverse = 0;
 
@@ -274,7 +290,7 @@ void timerAction(){
       // button REVERSE is pressed, retract material
       else if(digitalRead(BTN_EXT) && !digitalRead(BTN_REV)){
         stateMotor = MOTOR_REVERSE;
-        timeMotorReverse = 400; // reverse time is 50ms * timeMotorReverse (400 = 20s)
+        timeMotorReverse = 100; // reverse time is 50ms * timeMotorReverse (100 = 5s)
       }
       
       // both buttons are pressed, motor stopped
@@ -282,7 +298,7 @@ void timerAction(){
         stateMotor = MOTOR_STOP;
       }
       
-      // not buttons are pressed
+      // no buttons are pressed
       else{
         if(lastMotorState == MOTOR_EXTRUSION){
           stateMotor = MOTOR_REVERSE_AFTER_EXTRUSION;
@@ -342,9 +358,28 @@ void timerAction(){
   // one time action, mainly for material change
   static char buttonsPressed = 0;
 
+
+
+// button UP & DOWN pressed: change display 
+  if(!digitalRead(BTN_UP) and !digitalRead(BTN_DOWN) ){
+    if (! pressUPDOWNhandled) {
+      righthanded = ! righthanded;
+      pressUPDOWNhandled = true;
+      
+      ssd1306_clearScreen();
+      if (righthanded) {
+        ssd1306_flipHorizontal(1);  /* rotate screen in X */
+        ssd1306_flipVertical(1);    /* rotate screen in Y */
+      } else {
+        ssd1306_flipHorizontal(0); 
+        ssd1306_flipVertical(0); 
+      }
+      loadMaterial(materialID);
+    }
+  }
   // button UP pressed
-  if(!digitalRead(BTN_UP) && digitalRead(BTN_DOWN)){
-    if(!(buttonsPressed & 0x01)){
+  else if(!digitalRead(BTN_UP) ){
+    if (! pressUPDOWNhandled) {
       if(materialID < MATERIAL_COUNT-1){
         ++materialID;        
       }
@@ -352,18 +387,12 @@ void timerAction(){
         materialID = 0;
       }
       loadMaterial(materialID);
+      pressUPDOWNhandled = true;
     }
-    // save that this button UP was already pressed and used
-    buttonsPressed |= 0x01;
   }
-  else{
-    // save that this button UP was released
-    buttonsPressed &= 0xFE;
-  }
-
   // button DOWN pressed
-  if(digitalRead(BTN_UP) && !digitalRead(BTN_DOWN)){
-    if(!(buttonsPressed & 0x02)){
+  else  if( !digitalRead(BTN_DOWN)){
+    if(! pressUPDOWNhandled){
       if(materialID > 0){
         --materialID;
       }
@@ -371,13 +400,12 @@ void timerAction(){
         materialID = MATERIAL_COUNT-1;
       }
       loadMaterial(materialID);
+      pressUPDOWNhandled = true;
     }
-    // save that this button DOWN was already pressed and used
-    buttonsPressed |= 0x02;
   }
   else{
-    // save that this button DOWN was released
-    buttonsPressed &= 0xFD;
+    // save that this button was released
+    pressUPDOWNhandled = false;
   }
   
 }
@@ -392,6 +420,11 @@ void setup() {
   // initialize OLED display
   ssd1306_128x32_i2c_init();
   ssd1306_clearScreen();
+  if (righthanded) {
+    ssd1306_flipHorizontal(1);  /* rotate screen in X */
+    ssd1306_flipVertical(1);    /* rotate screen in Y */
+  }
+  
 
   // initialize outputs 
   pinMode(LED_NANO,  OUTPUT);
