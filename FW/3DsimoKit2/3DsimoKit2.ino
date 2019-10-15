@@ -4,7 +4,6 @@
 
 #include "config.h"
 #include "ssd1306.h"
-#include "nano_gfx.h"
 #include "nanodeUNIO.h"
 #include "accessories.h"
 #include <EveryTimer.h>

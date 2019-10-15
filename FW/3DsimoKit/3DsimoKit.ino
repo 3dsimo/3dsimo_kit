@@ -1,3 +1,6 @@
+/*
+ *  ssd1306   128x32   Alexey Dinda Library
+ */
 #include "ssd1306.h"
 #include "nano_gfx.h"
 #include <EveryTimer.h>
@@ -8,8 +11,8 @@
 
 #define LED_NANO    13    // LED placed on Arduino Nano board
 
-#define BTN_UP      11    // controlling button UP/PLUS
-#define BTN_DOWN    12    // controlling button DOWN/MINUS
+#define BTN_UP      12    // controlling button UP/PLUS                /* NEW! changed for right hand - default 11 */
+#define BTN_DOWN    11    // controlling button DOWN/MINUS             /* NEW! changed for right hand - default 12 */
 #define BTN_EXT     8     // button for material extrusion
 #define BTN_REV     7     // button for material reverse
 
@@ -51,17 +54,19 @@ typedef struct {
  */
 const profile_t materials[] PROGMEM = {  
   // {temperature (deg. C), motorSpeed (%), materialName}
-     {225,                  25,             "ABS"},
-     {210,                  40,             "PLA"}
+     {0,                  0,             "OFF"},    /* NEW! BEGIN OFF - BUT IF YOU SELECT THIS AFTER PETG, 3DPEN COOLS TO 153º PRIOR TO SHUTDOWN*/
+     {210,                  40,             "PLA"},
+     {230,                  30,             "ABS"},
+     {235,                  40,             "PETG"}
 };
 
 /*
  *   define number of materials in list and variables
  */
-#define MATERIAL_COUNT  2
+#define MATERIAL_COUNT  4
 
 int materialID = 0;         // chosen material profile
-int setTemperature = 225;   // set heater temperature
+int setTemperature = 210;   // set heater temperature
 int setMotorSpeed = 60;     // set motor speed in %
 
 /*
@@ -231,7 +236,7 @@ int heating(){
  */
 void timerAction(){
   static int elapsedTime = 0;
-  static char statusHeating = STATE_HEATING;
+  static char statusHeating = STATE_HEATING;   
   static char stateMotor = MOTOR_STOP, lastMotorState = MOTOR_STOP;
   static int timeMotorReverse = 0;
 
@@ -342,7 +347,9 @@ void timerAction(){
   // one time action, mainly for material change
   static char buttonsPressed = 0;
 
-  // button UP pressed
+
+
+// button UP pressed
   if(!digitalRead(BTN_UP) && digitalRead(BTN_DOWN)){
     if(!(buttonsPressed & 0x01)){
       if(materialID < MATERIAL_COUNT-1){
@@ -392,6 +399,9 @@ void setup() {
   // initialize OLED display
   ssd1306_128x32_i2c_init();
   ssd1306_clearScreen();
+  ssd1306_flipHorizontal(1);  /* oled_ssd1306.h   NEW! rotate screen in X */
+  ssd1306_flipVertical(1);   /* oled_ssd1306.h   NEW!  rotate screen in Y */
+  
 
   // initialize outputs 
   pinMode(LED_NANO,  OUTPUT);
