@@ -4,9 +4,7 @@
 
 Visit us at [3D simo pages](https://3dsimo.com/) for more information
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/d5TUmM0rqjs" frameborder="0" 
-  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
-</iframe>
+[![](https://img.youtube.com/vi/d5TUmM0rqjs/0.jpg)](https://www.youtube.com/watch?v=d5TUmM0rqjs)
 
 
 ## [3D printed parts](documents/3Dprint.md)
