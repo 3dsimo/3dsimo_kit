@@ -1,0 +1,46 @@
+### Module positions - created on 27/09/2019 13:14:16 ###
+### Printed by Pcbnew version (5.1.0-1358-ge58d9606d)
+## Unit = mm, Angle = deg.
+## Side : top
+# Ref     Val                 Package                                     PosX       PosY       Rot  Side
+C1        C-100n/50V          C_0603                                   78.2000    10.3000  270.0000  top
+C2        C-100n/50V          C_0603                                   66.1500    13.9000  180.0000  top
+C3        1u/25V              C_0603                                   75.2000     8.0500  180.0000  top
+C4        22u/10V             C_0805                                   69.1500     5.3000  180.0000  top
+C5        C-100n/50V          C_0603                                   65.7500     5.3000  180.0000  top
+C6        22u/10V             C_0805                                   43.4000     5.3500    0.0000  top
+C7        22u/10V             C_0805                                   43.4000     3.6000  180.0000  top
+C8        22u/10V             C_0805                                   72.9500     5.5000  270.0000  top
+C9        12p                 C_0603                                   60.7500     1.0500  180.0000  top
+C10       12p                 C_0603                                   68.5000     1.0500    0.0000  top
+C11       C-100n/50V          C_0603                                   52.5500    10.0500  270.0000  top
+C12       100u_6.3V           CP_Tantalum_Case-B_EIA-3528-21_Reflow    58.6500     8.4000  270.0000  top
+C13       100u_6.3V           CP_Tantalum_Case-B_EIA-3528-21_Reflow    77.1000     5.5000    0.0000  top
+D1        KPA-3010CGCK        KPA-3010                                  2.6500    15.2500    0.0000  top
+D2        KPA-3010CGCK        KPA-3010                                  2.6500     1.9000  180.0000  top
+J2        MCR-B-S-RA-TSMT-TR  MCR-B-S-RA-TSMT-TR                        1.5500     8.5000  270.0000  top
+J3        FiducialMark        AssemblyMark_1.0mm                       80.1500    15.4000    0.0000  top
+J4        FiducialMark        AssemblyMark_1.0mm                        9.0500     1.6500    0.0000  top
+Q1        DMG2305UX           SOT-23                                   76.8000    14.6000  180.0000  top
+Q2        NX3008              SOT-363_SC-70-6                          76.3000     2.0000   90.0000  top
+R1        1k                  R_0603                                   30.4500     9.1250  270.0000  top
+R2        1k                  R_0603                                   30.4500    12.2250   90.0000  top
+R3        100k                R_0603                                   74.3000    14.6000   90.0000  top
+R4        100R                R_0603                                   79.1500     2.8500    0.0000  top
+R5        100R                R_0603                                   61.6500     9.4500    0.0000  top
+R6        100R                R_0603                                   61.6500     8.0500  180.0000  top
+R7        100k                R_0603                                   73.5500     1.1500    0.0000  top
+R8        10k                 R_0603                                   53.9000    10.0500   90.0000  top
+R10       10k                 R_0603                                   79.1500     1.1500    0.0000  top
+R11       1k                  R_0603                                   43.4000     1.9500  180.0000  top
+R12       100k                R_0603                                   73.5000     2.8500  180.0000  top
+R13       100k                R_0603                                   77.8500     8.0500    0.0000  top
+R14       1k                  R_0603                                    9.9000    15.0500  270.0000  top
+R15       1k                  R_0603                                    5.8500     2.8500   90.0000  top
+SW1       TACTM-64N-F         TACTM-64N-F                               9.8000     8.5000    0.0000  top
+SW2       TACTM-64N-F         TACTM-64N-F                              22.0250     8.4750  180.0000  top
+U1        DRV8837             VDFN-8-1EP_2x2mm_Pitch0.5mm              75.2000    10.1500  180.0000  top
+U3        ATMEGA328P-MU       QFN-32-1EP_5x5mm_Pitch0.5mm              67.9000     9.6500   90.0000  top
+U4        CP2102N-QFN24       QFN-24-1EP_4x4mm_Pitch0.5mm              48.6500     7.5000    0.0000  top
+X2        16MHz               Crystal_SMD_3225-4pin_3.2x2.5mm          64.8500     2.0500    0.0000  top
+## End

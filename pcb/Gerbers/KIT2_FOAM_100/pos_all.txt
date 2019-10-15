@@ -1,0 +1,8 @@
+### Module positions - created on 03/13/19 17:44:08 ###
+### Printed by Pcbnew version kicad (5.0.0)
+## Unit = mm, Angle = deg.
+## Side : All
+# Ref     Val         Package                PosX       PosY       Rot  Side
+C1        C-100n_50V  C_0603              15.0000    15.6500  180.0000  top
+U1        11AA01_TT   SOT-23              18.7000    14.6500   90.0000  top
+## End

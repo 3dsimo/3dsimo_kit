@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name 3dsimo_kit-rescue)(type Legacy)(uri ${KIPRJMOD}/3dsimo_kit-rescue.lib)(options "")(descr ""))
+)
