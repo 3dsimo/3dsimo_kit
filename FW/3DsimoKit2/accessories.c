@@ -308,6 +308,8 @@ void acs3Ddrawing() {
     if (actualTemperature > setTemperature + 10) {
       statusHeating = STATE_COOLING;
       ssd1306_printFixedN(116, 16, "C", STYLE_NORMAL, FONT_SIZE_2X);
+      digitalWrite(LED_R, LOW);   // turn the LED off
+      digitalWrite(LED_L, LOW);   // turn the LED off
     }
 
     // tolerant zone where temperature is OK for extrusion/reverse
@@ -322,8 +324,8 @@ void acs3Ddrawing() {
     else {
       statusHeating = STATE_HEATING;
       ssd1306_printFixedN(116, 16, "H", STYLE_NORMAL, FONT_SIZE_2X);
-      digitalWrite(LED_R, !digitalRead(LED_R));   // turn the LED on (HIGH is the voltage level)
-      digitalWrite(LED_L, !digitalRead(LED_L));   // turn the LED on (HIGH is the voltage level)
+      digitalWrite(LED_R, !digitalRead(LED_R));   // toggle the LED (HIGH is the voltage level)
+      digitalWrite(LED_L, !digitalRead(LED_L));   // toggle the LED (HIGH is the voltage level)
     }
   }
 
