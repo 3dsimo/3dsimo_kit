@@ -33,7 +33,9 @@ Select port where is connected your development kit (Tools -> Port -> COMxx). In
 ### Processor
 **3Dsimo KIT** can use both types of microcontroller, you have to check it which one you have. The most probably version is **ATmega168**. 
 
-The **3Dsimo KIT 2** is using **ATmega328P** everytime. 
+The **3Dsimo KIT 2** is using **ATmega328P**. 
+
+Please be sure, you are using the right version of the bootloader. Arduino released a new version of Arduino IDE, where updated bootloader for Arduino NANO boards. In this case, used setting with a processor called **ATmega328P (old bootloader)**. 
 
 ![](pic/Arduino_choose_MCU.png)
 
