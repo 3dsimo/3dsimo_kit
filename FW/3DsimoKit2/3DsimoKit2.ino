@@ -4,6 +4,7 @@
 
 #include "config.h"
 #include "ssd1306.h"
+#include "nano_gfx.h"
 #include "nanodeUNIO.h"
 #include "accessories.h"
 #include <EveryTimer.h>
@@ -12,6 +13,10 @@
  *   create timer for main loop
  */
 EveryTimer timer;
+
+bool righthanded = true;
+bool pressUPDOWNhandled = true;
+extern int materialID;
 
 /*
  *   call every 50ms timer for buttons action and heating 
@@ -46,6 +51,26 @@ void timerAction(){
       acs.startup();
     }
   acsLast = acs;
+
+  // button UP & DOWN pressed: change display 
+  if(!digitalRead(BTN_UP) && !digitalRead(BTN_DOWN) ){
+    if (! pressUPDOWNhandled) {
+      righthanded = ! righthanded;
+      pressUPDOWNhandled = true;
+
+      ssd1306_clearScreen();
+      if (righthanded) {
+        ssd1306_flipHorizontal(1);  /* rotate screen in X */
+        ssd1306_flipVertical(1);    /* rotate screen in Y */
+      } else {
+        ssd1306_flipHorizontal(0); 
+        ssd1306_flipVertical(0); 
+      }
+    }
+  }
+  else{
+    pressUPDOWNhandled = false;
+  }
 }
 
 /*

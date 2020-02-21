@@ -12,15 +12,15 @@ accessories_t accessories;
 const profile_t materials[] PROGMEM = {
   // {temperature (deg. C), motorSpeed (%), materialName}
      {0,                  0,            "OFF"},    /* NEW! BEGIN OFF - BUT IF YOU SELECT THIS AFTER PETG, 3DPEN COOLS TO 153º PRIOR TO SHUTDOWN*/
-     {210,                60,           "PLA"},
-     {230,                50,           "ABS"},
-     {235,                60,           "PETG"},
+     {230,                60,           "PLA"},
+     {250,                50,           "ABS"},
+     {245,                60,           "PETG"},
 };
 
 /*
      define number of materials in list and variables
 */
-#define MATERIAL_COUNT  4
+const int MATERIAL_COUNT  = sizeof(materials)/sizeof(profile_t);
 
 int materialID = 0;         // chosen material profile
 int setTemperature = 0;   // set heater temperature
@@ -115,7 +115,7 @@ void percentRoutine(void){
  *    forbidden range is from 130 C to 185 C, because temperature is inacurate and unstable
  */
 int getTemperature() { // get temperature in deg. Celsius from ADU value
-  int avgTemp = 0;
+  long avgTemp = 0;
   char text[10];
 
   // set reference for ADC to power supply (5V)
@@ -144,24 +144,26 @@ int getTemperature() { // get temperature in deg. Celsius from ADU value
     for (int i = 0; i < 16; i++) {
       avgTemp += analogRead(TEMP_IN);
     }
-
-    // convert ADU into temperature
+    
+    // convert ADU into temperature (multiplied by 10 -> 200deg = 2000)
     // constants could slightly change for different ceramic tip
-    // T = -0.1448*ADU + 168.5
+    // T = -0.1232*ADU + 146.1
+    // Low temperatures (approx. 40 - 120 deg.)
     tempADU = avgTemp;
-    tempADU *= -148;
+    tempADU *= -1261;   // -1261 = -0.1232*1024
     tempADU >>=  14;
-    tempADU += 168;
+    tempADU += 1461; 
 
   }
   else {
     // convert ADU into temperature
     // constants could slightly change for different ceramic tip
-    // T = -0.2984*ADU + 466
+    // T = -0.2059*ADU + 351.4
+    // High temperatures (approx. 180 - 280 deg.)
     tempADU = avgTemp;
-    tempADU *= -306;
+    tempADU *= -2108;   // -2108 = -0.2059*1024
     tempADU >>=  14;
-    tempADU += 466;
+    tempADU += 3514;
   }
 
   return tempADU;
@@ -190,7 +192,7 @@ void loadMaterial(int id) {
 /*
     PID variables and constants for tuning
 */
-float Kp = 15, Ki = 1, Kd = 1.0, dT = 0.1, Hz = 10;
+float Kp = 3.2, Ki = 0.33, Kd = 0.14, dT = 0.1, Hz = 10;
 
 /*
      basic PID routine to get output value
@@ -202,13 +204,13 @@ int getPIDoutput(int setPoint, int actualValue, int maxValue, int minValue) {
   static int pidAvg[4] = {0, 0, 0, 0};
   static int pidAvgIndex = 0;
 
-
   // reset sumE when actualValue exceed setPoint by 5
   static int noWaitCycles = 0;
-  if (actualValue > setPoint + 5) {
+  
+  if (actualValue > setPoint + 50) {
     ++noWaitCycles;
     if (noWaitCycles >= 30) {
-      sumE = 100;
+      sumE = maxValue;
       noWaitCycles = 0;
     }
   }
@@ -263,7 +265,7 @@ int heating() {
 
   // resolve PID value for heater PWM
   int temperature = getTemperature();
-  int valuePID = getPIDoutput(setTemperature, temperature, 255, 0);
+  int valuePID = getPIDoutput(setTemperature*10, temperature, 255, 0);
 
   analogWrite(HEATER_EN, 255 - valuePID);
 
@@ -273,26 +275,16 @@ int heating() {
     tempAvgIter = 0;
 
   // make temperature average from NO_AVERAGES_VALUES
-  int sumTemp = 0;
+  long sumTemp = 0;
   for (int i = 0; i < NO_AVERAGES_VALUES; i++) {
     sumTemp += tempAvg[i];
   }
   sumTemp /= NO_AVERAGES_VALUES;
 
   // show on display actual and preset temperature
-  sprintf(text, "%3d/%3dC", sumTemp, setTemperature);
+  sprintf(text, "%3d/%3dC", (int)sumTemp/10, setTemperature);
   ssd1306_setFixedFont(ssd1306xled_font6x8);
   ssd1306_printFixedN(0, 16, text, STYLE_NORMAL, FONT_SIZE_2X);
-
-  /*
-     debug output into display and to serial
-  */
-  /*
-    sprintf(text, "PID=%03d", valuePID);
-    ssd1306_printFixed(0, 0, text, STYLE_NORMAL);
-    sprintf(text, "%3d;%3d", valuePID, sumTemp);
-    Serial.println(text);
-  */
 
   return sumTemp;
 }
@@ -305,15 +297,13 @@ void acs3Ddrawing() {
 
     // tolerant zone where temperature is ABOVE preset temperature,
     // but it is possible to do extrusion/reverse
-    if (actualTemperature > setTemperature + 10) {
+    if (actualTemperature > setTemperature*10 + 100) {
       statusHeating = STATE_COOLING;
       ssd1306_printFixedN(116, 16, "C", STYLE_NORMAL, FONT_SIZE_2X);
-      digitalWrite(LED_R, LOW);   // turn the LED off
-      digitalWrite(LED_L, LOW);   // turn the LED off
     }
 
     // tolerant zone where temperature is OK for extrusion/reverse
-    else if (actualTemperature > setTemperature - 10) {
+    else if (actualTemperature > setTemperature*10 - 100) {
       statusHeating = STATE_READY;
       ssd1306_printFixedN(116, 16, "R", STYLE_NORMAL, FONT_SIZE_2X);
       digitalWrite(LED_R, HIGH);   // turn the LED on (HIGH is the voltage level)
@@ -324,8 +314,8 @@ void acs3Ddrawing() {
     else {
       statusHeating = STATE_HEATING;
       ssd1306_printFixedN(116, 16, "H", STYLE_NORMAL, FONT_SIZE_2X);
-      digitalWrite(LED_R, !digitalRead(LED_R));   // toggle the LED (HIGH is the voltage level)
-      digitalWrite(LED_L, !digitalRead(LED_L));   // toggle the LED (HIGH is the voltage level)
+      digitalWrite(LED_R, !digitalRead(LED_R));   // turn the LED on (HIGH is the voltage level)
+      digitalWrite(LED_L, !digitalRead(LED_L));   // turn the LED on (HIGH is the voltage level)
     }
   }
 
@@ -348,8 +338,8 @@ void acs3Ddrawing() {
         else if (!digitalRead(BTN_EXT) && !digitalRead(BTN_REV)) {
           stateMotor = MOTOR_STOP;
         }
-
-        // not buttons are pressed
+        
+        // no buttons are pressed
         else {
           if (lastMotorState == MOTOR_EXTRUSION) {
             stateMotor = MOTOR_REVERSE_AFTER_EXTRUSION;
