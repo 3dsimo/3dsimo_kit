@@ -12,9 +12,9 @@ accessories_t accessories;
 const profile_t materials[] PROGMEM = {
   // {temperature (deg. C), motorSpeed (%), materialName}
      {0,                  0,            "OFF"},    /* NEW! BEGIN OFF - BUT IF YOU SELECT THIS AFTER PETG, 3DPEN COOLS TO 153º PRIOR TO SHUTDOWN*/
-     {230,                60,           "PLA"},
-     {250,                50,           "ABS"},
-     {245,                60,           "PETG"},
+     {210,                60,           "PLA"},
+     {230,                50,           "ABS"},
+     {235,                60,           "PETG"},
 };
 
 /*
@@ -416,6 +416,10 @@ void acs3Ddrawing() {
   else {
     // save that this button UP was released
     buttonsPressed &= 0xFE;
+  }
+
+  if(!digitalRead(BTN_UP) && !digitalRead(BTN_DOWN) ){
+      loadMaterial(materialID);
   }
 
   // button DOWN pressed
