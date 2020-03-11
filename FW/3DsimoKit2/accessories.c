@@ -3,6 +3,8 @@
 #include "nanodeUNIO.h"
 #include "accessories.h"
 #include <math.h>
+#include <stdio.h>
+#include <string.h>
 
 accessories_t accessories;
 
@@ -12,9 +14,9 @@ accessories_t accessories;
 const profile_t materials[] PROGMEM = {
   // {temperature (deg. C), motorSpeed (%), materialName}
      {0,                  0,            "OFF"},    /* NEW! BEGIN OFF - BUT IF YOU SELECT THIS AFTER PETG, 3DPEN COOLS TO 153º PRIOR TO SHUTDOWN*/
-     {210,                60,           "PLA"},
-     {230,                50,           "ABS"},
-     {235,                60,           "PETG"},
+     {230,                60,           "PLA"},
+     {250,                50,           "ABS"},
+     {245,                60,           "PETG"},
 };
 
 /*
@@ -259,7 +261,7 @@ int heating() {
 
   // variables initialization
   if (!firstTime) {
-    memset(tempAvg, 0, sizeof(tempAvg)*sizeof(int));
+    memset(tempAvg, 0, NO_AVERAGES_VALUES*sizeof(int));
     firstTime = 1;
   }
 
@@ -513,4 +515,3 @@ void acsIdentify(void) {
 accessories_t getAccessories(void) {
   return accessories;
 }
-

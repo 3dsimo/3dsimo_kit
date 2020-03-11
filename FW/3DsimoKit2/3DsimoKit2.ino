@@ -1,7 +1,8 @@
 /*
  *  ssd1306   128x32   Alexey Dinda Library
  */
-
+#include <stdio.h>
+#include <string.h>
 #include "config.h"
 #include "ssd1306.h"
 #include "nano_gfx.h"
@@ -10,7 +11,7 @@
 #include <EveryTimer.h>
 
 /*
- *   create timer for main loop
+ *   create timer for main loop 
  */
 EveryTimer timer;
 
