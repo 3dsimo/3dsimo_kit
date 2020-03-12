@@ -1,5 +1,4 @@
 EESchema Schematic File Version 4
-LIBS:3dsimo_kit-cache
 EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
@@ -357,7 +356,7 @@ Wire Wire Line
 Wire Wire Line
 	2550 900  2550 1150
 $Comp
-L IC:ATMEGA328P-MU U3
+L mcu:ATMEGA328P-MU U3
 U 1 1 5C5436D8
 P 4450 4900
 F 0 "U3" H 4500 6267 50  0000 C CNN
@@ -509,7 +508,7 @@ Connection ~ 9000 3550
 Wire Wire Line
 	9000 3550 9000 3600
 $Comp
-L passive:C-22u_6.3V C7
+L passive:22u_10V C7
 U 1 1 5C5703F0
 P 9300 3450
 F 0 "C7" V 9048 3450 50  0000 C CNN
@@ -544,7 +543,7 @@ Connection ~ 9000 3450
 Wire Wire Line
 	9000 3450 9000 3550
 $Comp
-L passive:C-22u_6.3V C4
+L passive:22u_10V C4
 U 1 1 5C579BF0
 P 6050 4100
 F 0 "C4" H 6000 4000 50  0000 R CNN
@@ -616,7 +615,7 @@ Wire Wire Line
 Wire Wire Line
 	6050 4250 6050 4300
 $Comp
-L passive:C-100n_50V C2
+L passive:100n_50V C2
 U 1 1 5C59F1C5
 P 5600 4600
 F 0 "C2" H 5715 4646 50  0000 L CNN
@@ -659,7 +658,7 @@ Wire Wire Line
 Wire Wire Line
 	10350 4050 9500 4050
 $Comp
-L passive:C-22u_6.3V C6
+L passive:22u_10V C6
 U 1 1 5C5CD80B
 P 8400 3500
 F 0 "C6" V 8148 3500 50  0000 C CNN
@@ -1322,7 +1321,7 @@ Wire Wire Line
 Wire Wire Line
 	1350 5800 1350 5900
 $Comp
-L passive:C-100n_50V C1
+L passive:100n_50V C1
 U 1 1 5AFBEE53
 P 1800 1450
 F 0 "C1" V 1750 1250 50  0000 C CNN
@@ -1383,7 +1382,7 @@ NoConn ~ 9400 1650
 Wire Wire Line
 	5000 2150 5000 2250
 $Comp
-L passive:C-22u_6.3V C8
+L passive:22u_10V C8
 U 1 1 5C6CB371
 P 3100 1100
 F 0 "C8" H 3050 1000 50  0000 R CNN
@@ -1686,7 +1685,7 @@ $EndComp
 Wire Wire Line
 	3550 1300 3550 1250
 $Comp
-L passive:C-100n_50V C5
+L passive:22u_10V C5
 U 1 1 5C5846A5
 P 6450 4100
 F 0 "C5" H 6565 4146 50  0000 L CNN
@@ -1703,7 +1702,7 @@ F 9 "CL10B104KB8NNNC" H 6550 4300 60  0001 C CNN "PN"
 	1    0    0    -1  
 $EndComp
 $Comp
-L passive:C-100n_50V C11
+L passive:100n_50V C11
 U 1 1 5CE7C139
 P 7800 4600
 F 0 "C11" V 8052 4600 50  0000 C CNN
