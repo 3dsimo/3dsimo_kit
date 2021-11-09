@@ -14,7 +14,7 @@ OLED display based on SSD1306 driver is connected through an TWI interface to th
 The microcontroller is possible to reprogram through the USB and USB<>UART converter. The layout is similar to standard Arduino Nano programming interface, but chosen converter is different - CP2102N. Program is written in C/C++ language in Arduino IDE. More information about programming you can find in [Firmware chapter](Firmware.md).
 
 ### Layout
-3Dsimo KIT 2 contains 4 boards, where one is main board with MCU and three boards are used for interchangable extensions. All boards are designed in Open-source program [KiCAD](http://kicad-pcb.org/) in the recent version 5.1.4. 3D models are mainly taken from KiCADs repositories, but several were drawn or taken from the manufacturer and they are not included in KiCADs github. You can find them in folder with all [3D models](../pcb/Documents/3D) used for 3DSimo KIT.
+3Dsimo KIT 2 contains 4 boards, where one is main board with MCU and three boards are used for interchangable extensions. All boards are designed in Open-source program [KiCAD](http://kicad.org/) in the recent version 5.1.4. 3D models are mainly taken from KiCADs repositories, but several were drawn or taken from the manufacturer and they are not included in KiCADs github. You can find them in folder with all [3D models](../pcb/Documents/3D) used for 3DSimo KIT.
 
 ### Temperature measurement
 3Dsimo KIT2 is equipped with two ranges thermal measurement, one for PCL materials (temperatures in range from 30°C to 120°C) and the second one for other plastics material such as ABS, PLA, etc. (from 180°C to 300°C). These two ranges provides unlimited possibilities in different material usage. 
@@ -39,7 +39,7 @@ OLED display based on SSD1306 driver is connected through an TWI interface and a
 The microcontroller is possible to reprogram through the mini USB connector placed directly on the Arduino Nano like development kit. Program is written in C/C++ language in Arduino IDE. More information about programming you can find in [Firmware chapter](Firmware.md).
 
 ### Layout
-3Dsimo KIT contains one interface board, which is used for connecting display, buttons, motor driver and etc. with MCU. The board is designed in Open-source program [KiCAD](http://kicad-pcb.org/). 3D models are mainly taken from KiCADs repositories, but several were drawn or taken from the manufacturer and they are not included in KiCADs github. You can find them in folder with all [3D models](../pcb/Documents/3D) used for 3DSimo KIT.
+3Dsimo KIT contains one interface board, which is used for connecting display, buttons, motor driver and etc. with MCU. The board is designed in Open-source program [KiCAD](http://kicad.org/). 3D models are mainly taken from KiCADs repositories, but several were drawn or taken from the manufacturer and they are not included in KiCADs github. You can find them in folder with all [3D models](../pcb/Documents/3D) used for 3DSimo KIT.
 
 ### Temperature measurement
 3Dsimo KIT is equipped with only one range for melting common plastics for 3D printers such as ABS, PLA, etc. and its range is from 180°C to 300°C. 
