@@ -17,7 +17,7 @@ EveryTimer timer;
 
 bool righthanded = true;
 bool pressUPDOWNhandled = true;
-extern int materialID;
+//extern int materialID;
 
 /*
  *   call every 50ms timer for buttons action and heating 
