@@ -8,18 +8,6 @@
 
 accessories_t accessories;
 
-/*
-     define material profiles for 3D extension
-     didn't remove for Freemode but shouldn't affect anything 
-*/
-const profile_t materials[] PROGMEM = {
-  // {temperature (deg. C), motorSpeed (%), materialName}
-     {0,                  0,            "OFF"},    /* NEW! BEGIN OFF - BUT IF YOU SELECT THIS AFTER PETG, 3DPEN COOLS TO 153º PRIOR TO SHUTDOWN*/
-     {230,                60,           "PLA"},
-     {250,                50,           "ABS"},
-     {245,                60,           "PETG"},
-};
-
 #define MAXSPEED 70         // for safety. change this up to 100 (%), if you know what you are doing.
 #define MAXTEMP 275         // not sure whats better: define or const, also not sure about the actual max temp... testing with 300
 #define MINTEMP 155         // 153/154 is the lowest measurement possible. actual temperature can be lower. 
@@ -29,23 +17,15 @@ int setTemperature = 0;         // set heater temperature (we raise this directl
 int setMotorSpeed = 40;         // set motor speed in %
                                 // ToDo maybe add icrement step value (hardcoded at 5)
 char controlMode = MODE_TEMP;   // Control Mode: MODE_TEMP or MODE_SPEED. selects which values the UP-DOWN buttons change
-
-/*
-     define number of materials in list and variables
-*/
-const int MATERIAL_COUNT  = sizeof(materials)/sizeof(profile_t);
-
-int materialID = 0;         // chosen material profile
-
-
+ 
 int elapsedTime = 0;
 char statusHeating = STATE_HEATING;
 char stateMotor = MOTOR_STOP, lastMotorState = MOTOR_STOP;
+
 int timeMotorReverse = 0;
 char powerPercent = 50;
 
 void startup3D(void) {
-  loadMaterial(materialID);
   digitalWrite(MOTOR_DIR, LOW);
   analogWrite(MOTOR_PWM, 0);
 }
@@ -182,28 +162,6 @@ int getTemperature() { // get temperature in deg. Celsius from ADU value
 }
 
 /*
-     load actual material profile
-*/
-void loadMaterial(int id) {
-  profile_t profile;
-  char text[10];
-
-  // load material profile from PROGMEM and assign variables
-  memcpy_P(&profile, &materials[id], sizeof(profile_t));
-/*
-  setTemperature = profile.temperature;
-  setMotorSpeed  = profile.motorSpeed;
-*/
-  // clear display and show all information
-/*  sprintf(text, "%d %%", setMotorSpeed);
-  ssd1306_clearScreen();
-  ssd1306_setFixedFont(ssd1306xled_font6x8);
-  ssd1306_printFixedN(0,  0, profile.materialName, STYLE_NORMAL, FONT_SIZE_2X);
-  ssd1306_printFixedN(80, 0, text, STYLE_NORMAL, FONT_SIZE_2X);*/
-
-}
-
-/*
     PID variables and constants for tuning
 */
 float Kp = 3.2, Ki = 0.33, Kd = 0.14, dT = 0.1, Hz = 10;
@@ -296,12 +254,13 @@ int heating() {
   sumTemp /= NO_AVERAGES_VALUES;
 
  
-displayControls();
+  displayControls();
+
  // show on display actual and preset temperature
   sprintf(text, "%3d", (int)sumTemp/10);
   ssd1306_setFixedFont(ssd1306xled_font6x8);
   ssd1306_printFixedN(0, 0, text, STYLE_NORMAL, FONT_SIZE_2X);
-  ssd1306_printFixedN(39, 12, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
+  ssd1306_printFixedN(40, 12, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
 
 
  return sumTemp;
@@ -318,12 +277,12 @@ void acs3Ddrawing() {
     if (actualTemperature > setTemperature*10 + 100) {
       statusHeating = STATE_COOLING;
       ssd1306_printFixedN(64, 0, "Cooling", STYLE_NORMAL, FONT_SIZE_NORMAL);
-    }
-
+   }
+   
     // tolerant zone where temperature is OK for extrusion/reverse
     else if (actualTemperature > setTemperature*10 - 100) {
       statusHeating = STATE_READY;
-      ssd1306_printFixedN(64, 0, "Ready  ", STYLE_NORMAL, FONT_SIZE_NORMAL); //spaces used instead of clearing space as heating is longer
+      ssd1306_printFixedN(64, 0, "Ready  ", STYLE_NORMAL, FONT_SIZE_NORMAL); //spaces used as extra characters because "heating" is a longer word
       digitalWrite(LED_R, HIGH);   // turn the LED on (HIGH is the voltage level)
       digitalWrite(LED_L, HIGH);   // turn the LED on (HIGH is the voltage level)
     }
@@ -337,10 +296,12 @@ void acs3Ddrawing() {
     }
   }
 
-  // assing functions according to heating state (mainly button function)
+  // assessing functions according to heating state (mainly button function)
   switch (statusHeating) {
-    case STATE_COOLING:
-    case STATE_READY: {
+   case STATE_COOLING:
+      stateMotor = MOTOR_STOP;
+      break;
+   case STATE_READY: {
         // button EXTRUSION is pressed, extrude material
         if (!digitalRead(BTN_EXT) && digitalRead(BTN_REV)) {
           stateMotor = MOTOR_EXTRUSION;
@@ -366,13 +327,10 @@ void acs3Ddrawing() {
         }
         break;
       }
-
     case STATE_HEATING:
       // if happened that heater has so low temperature, motor stop
       digitalWrite(MOTOR_DIR, LOW);
       analogWrite(MOTOR_PWM, 0);
-      stateMotor = MOTOR_STOP;
-      break;
   }
 
   // resolve motor states (Extrusion, Reverse, Stop, ...)
@@ -505,21 +463,21 @@ void displayControls() {
   if (controlMode == MODE_TEMP) {
     ssd1306_negativeMode();
     ssd1306_printFixedN(0, 16, textSetTemp, STYLE_NORMAL, FONT_SIZE_2X);
-    ssd1306_printFixedN(36+3, 24, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
+    ssd1306_printFixedN(40, 28, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
     ssd1306_positiveMode();
     ssd1306_printFixedN(68, 16, textSetMotor, STYLE_NORMAL, FONT_SIZE_2X);
-    ssd1306_printFixedN(110, 24, "%", STYLE_NORMAL, FONT_SIZE_NORMAL);
+    ssd1306_printFixedN(108, 24, "%", STYLE_NORMAL, FONT_SIZE_NORMAL);
   } else {
     ssd1306_printFixedN(0, 16, textSetTemp, STYLE_NORMAL, FONT_SIZE_2X);
-    ssd1306_printFixedN(36+3, 24, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
+    ssd1306_printFixedN(40, 28, "C", STYLE_NORMAL, FONT_SIZE_NORMAL);
     ssd1306_negativeMode();
     ssd1306_printFixedN(68, 16, textSetMotor, STYLE_NORMAL, FONT_SIZE_2X);
-    ssd1306_printFixedN(110, 24, "%", STYLE_NORMAL, FONT_SIZE_NORMAL);
+    ssd1306_printFixedN(108, 24, "%", STYLE_NORMAL, FONT_SIZE_NORMAL);
     ssd1306_positiveMode();
   }
 
-  ssd1306_printFixedN(60, 16, "<", STYLE_NORMAL, FONT_SIZE_NORMAL);   // icon in the middle
-  ssd1306_printFixedN(60, 24, ">", STYLE_NORMAL, FONT_SIZE_NORMAL);
+  ssd1306_printFixedN(56, 16, "<", STYLE_NORMAL, FONT_SIZE_NORMAL);   // icon in the middle
+  ssd1306_printFixedN(56, 24, ">", STYLE_NORMAL, FONT_SIZE_NORMAL);
 
 }
 
